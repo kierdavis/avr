@@ -68,6 +68,7 @@ var handlers = [...]instHandler{
 	doMUL,
 	doMULS,
 	doMULSU,
+	doNEG,
 }
 
 func init() {
@@ -1048,4 +1049,24 @@ func doMULSU(em *Emulator, word uint16) (cycles int) {
 	em.regs[1] = uint8(x >> 8)
 	em.regs[0] = uint8(x)
 	return 2
+}
+
+// negate
+func doNEG(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := (word & 0x01F0) >> 4
+	// get operand
+	a := em.regs[d]
+	// compute result
+	x := -a
+	// set flags
+	em.flags[avr.FlagH] = ((a | x) & 0x08) >> 3
+	em.flags[avr.FlagV] = b2i(x == 0x80)
+	em.flags[avr.FlagN] = (x & 0x80) >> 7
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagC] = b2i(x != 0)
+	em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
+	// store result
+	em.regs[d] = x
+	return 1
 }

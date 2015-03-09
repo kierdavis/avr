@@ -76,6 +76,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.LAT
     case word&0xFE0F == 0x9400:
         return avr.COM
+    case word&0xFE0F == 0x9401:
+        return avr.NEG
     case word&0xFE0F == 0x9403:
         return avr.INC
     case word&0xFE0F == 0x9405:

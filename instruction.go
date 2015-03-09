@@ -63,6 +63,7 @@ const (
     MUL
     MULS
     MULSU
+    NEG
     
     NumInstructions
 )
@@ -128,6 +129,7 @@ var instStrings = [...]string{
     "MUL",
     "MULS",
     "MULSU",
+    "NEG",
 }
 
 func init() {
