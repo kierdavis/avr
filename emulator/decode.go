@@ -24,6 +24,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.FMULSU
     case word&0xFC00 == 0x0400:
         return avr.CPC
+    case word&0xFC00 == 0x0800:
+        return avr.SBC
     case word&0xFC00 == 0x0C00:
         return avr.ADD
     case word&0xFC00 == 0x1000:
@@ -42,6 +44,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.MOV
     case word&0xF000 == 0x3000:
         return avr.CPI
+    case word&0xF000 == 0x4000:
+        return avr.SBCI
     case word&0xF000 == 0x6000:
         return avr.ORI
     case word&0xF000 == 0x7000:
