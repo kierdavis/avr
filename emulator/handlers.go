@@ -274,13 +274,7 @@ func doCALL(em *Emulator, word uint16) (cycles int) {
 	kl := em.fetchProgWord()
 	k := (uint32(kh) << 32) | uint32(kl)
 
-	if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
-		em.push(uint8(em.pc >> 16))
-	}
-
-	em.push(uint8(em.pc >> 8))
-	em.push(uint8(em.pc))
-
+	em.pushPC()
 	em.pc = k
 	
 	if em.Spec.LogProgMemSize > 16 {
@@ -438,12 +432,7 @@ func doDES(em *Emulator, word uint16) (cycles int) {
 
 // extended indirect call
 func doEICALL(em *Emulator, word uint16) (cycles int) {
-	if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
-		em.push(uint8(em.pc >> 16))
-	}
-	em.push(uint8(em.pc >> 8))
-	em.push(uint8(em.pc))
-
+	em.pushPC()
 	em.pc = (uint32(em.eind) << 16) | (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
 
 	if em.Spec.Family == spec.XMEGA {
@@ -600,12 +589,7 @@ func doFMULSU(em *Emulator, word uint16) (cycles int) {
 
 // indirect call
 func doICALL(em *Emulator, word uint16) (cycles int) {
-	if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
-		em.push(uint8(em.pc >> 16))
-	}
-	em.push(uint8(em.pc >> 8))
-	em.push(uint8(em.pc))
-
+	em.pushPC()
 	em.pc = (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
 
 	if em.Spec.LogProgMemSize > 16 {
@@ -1163,12 +1147,7 @@ func doRCALL(em *Emulator, word uint16) (cycles int) {
 	k = (k << 20) >> 20
 	
 	// push PC
-	if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
-		em.push(uint8(em.pc >> 16))
-	}
-
-	em.push(uint8(em.pc >> 8))
-	em.push(uint8(em.pc))
+	em.pushPC()
 	
 	// do the jump
 	em.pc += uint32(k)

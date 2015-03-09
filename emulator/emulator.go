@@ -159,6 +159,24 @@ func (em *Emulator) pop() uint8 {
 	return em.loadDataByte(em.sp)
 }
 
+func (em *Emulator) pushPC() {
+    if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
+        em.push(uint8(em.pc >> 16))
+    }
+
+    em.push(uint8(em.pc >> 8))
+    em.push(uint8(em.pc))
+}
+
+func (em *Emulator) popPC() {
+	em.pc = uint32(em.pop())
+	em.pc |= uint32(em.pop()) << 8
+
+    if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
+        em.pc |= uint32(em.pop()) << 16
+    }
+}
+
 func (em *Emulator) readPort(bankNum uint, index uint16) uint8 {
 	port, ok := em.ports[avr.PortRef{bankNum, index}]
 	if !ok {
