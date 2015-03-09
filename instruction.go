@@ -59,6 +59,7 @@ const (
     LPM_INC
     LSR
     MOV
+    MOVW
     
     NumInstructions
 )
@@ -121,6 +122,7 @@ func (inst Instruction) String() string {
     case LPM_INC:   return "LPM_INC"
     case LSR:       return "LSR"
     case MOV:       return "MOV"
+    case MOVW:      return "MOVW"
     default:        return ""
     }
 }

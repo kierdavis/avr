@@ -64,6 +64,7 @@ var handlers = [...]instHandler{
 	doLPM_INC,
 	doLSR,
 	doMOV,
+	doMOVW,
 }
 
 func init() {
@@ -977,5 +978,14 @@ func doMOV(em *Emulator, word uint16) (cycles int) {
 	d := (word & 0x01F0) >> 4
 	r := ((word & 0x0200) >> 5) | (word & 0x000F)
 	em.regs[d] = em.regs[r]
+	return 1
+}
+
+// move word
+func doMOVW(em *Emulator, word uint16) (cycles int) {
+	d := 2 * ((word & 0x00F0) >> 4)
+	r := 2 * (word & 0x000F)
+	em.regs[d] = em.regs[r]
+	em.regs[d+1] = em.regs[r+1]
 	return 1
 }

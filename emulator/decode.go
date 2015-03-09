@@ -8,6 +8,8 @@ import (
 // bit patterns are used for alternate forms of LDS and STS.
 func Decode(word uint16, reducedCore bool) avr.Instruction {
     switch {
+    case word&0xFF00 == 0x0100:
+        return avr.MOVW
     case word&0xFF88 == 0x0308:
         return avr.FMUL
     case word&0xFF88 == 0x0380:
