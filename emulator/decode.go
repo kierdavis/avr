@@ -54,6 +54,10 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.LDD_Z
     case word&0xD208 == 0x8008 && !reducedCore:
         return avr.LDD_Y
+    case word&0xD208 == 0x8200 && !reducedCore:
+        return avr.STD_Z
+    case word&0xD208 == 0x8208 && !reducedCore:
+        return avr.STD_Y
     case word&0xFE0F == 0x9000 && !reducedCore:
         return avr.LDS
     case word&0xFE0F == 0x9001:
@@ -82,12 +86,26 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.POP
     case word&0xFE0F == 0x920F:
         return avr.PUSH
+    case word&0xFE0F == 0x9201:
+        return avr.ST_Z_INC
+    case word&0xFE0F == 0x9202:
+        return avr.ST_Z_DEC
     case word&0xFE0F == 0x9205:
         return avr.LAS
     case word&0xFE0F == 0x9206:
         return avr.LAC
     case word&0xFE0F == 0x9207:
         return avr.LAT
+    case word&0xFE0F == 0x9209:
+        return avr.ST_Y_INC
+    case word&0xFE0F == 0x920A:
+        return avr.ST_Y_DEC
+    case word&0xFE0F == 0x920C:
+        return avr.ST_X
+    case word&0xFE0F == 0x920D:
+        return avr.ST_X_INC
+    case word&0xFE0F == 0x920E:
+        return avr.ST_X_DEC
     case word&0xFE0F == 0x9400:
         return avr.COM
     case word&0xFE0F == 0x9401:

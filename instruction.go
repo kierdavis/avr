@@ -86,6 +86,15 @@ const (
     SLEEP
     SPM
     SPM_2
+    ST_X
+    ST_X_INC
+    ST_X_DEC
+    ST_Y_INC
+    ST_Y_DEC
+    STD_Y
+    ST_Z_INC
+    ST_Z_DEC
+    STD_Z
     
     NumInstructions
 )
@@ -174,6 +183,15 @@ var instStrings = [...]string{
     "SLEEP",
     "SPM",
     "SPM_2",
+    "ST_X",
+    "ST_X_INC",
+    "ST_X_DEC",
+    "ST_Y_INC",
+    "ST_Y_DEC",
+    "STD_Y",
+    "ST_Z_INC",
+    "ST_Z_DEC",
+    "STD_Z",
 }
 
 func init() {

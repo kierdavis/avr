@@ -91,6 +91,15 @@ var handlers = [...]instHandler{
 	doSLEEP,
 	doSPM,
 	doSPM_2,
+	doST_X,
+	doST_X_INC,
+	doST_X_DEC,
+	doST_Y_INC,
+	doST_Y_DEC,
+	doSTD_Y,
+	doST_Z_INC,
+	doST_Z_DEC,
+	doSTD_Z,
 }
 
 func init() {
@@ -1395,4 +1404,49 @@ func doSPM(em *Emulator, word uint16) (cycles int) {
 func doSPM_2(em *Emulator, word uint16) (cycles int) {
 	panic("doSPM_2: unimplemented")
 	return 1
+}
+
+// store using pointer X
+func doST_X(em *Emulator, word uint16) (cycles int) {
+	panic("doST_X: unimplemented")
+}
+
+// store using pointer X (post-increment)
+func doST_X_INC(em *Emulator, word uint16) (cycles int) {
+	panic("doST_X_INC: unimplemented")
+}
+
+// store using pointer X (pre-decrement)
+func doST_X_DEC(em *Emulator, word uint16) (cycles int) {
+	panic("doST_X_DEC: unimplemented")
+}
+
+// store using pointer Y (post-increment)
+func doST_Y_INC(em *Emulator, word uint16) (cycles int) {
+	panic("doST_Y_INC: unimplemented")
+}
+
+// store using pointer Y (pre-decrement)
+func doST_Y_DEC(em *Emulator, word uint16) (cycles int) {
+	panic("doST_Y_DEC: unimplemented")
+}
+
+// store using pointer Y with displacement
+func doSTD_Y(em *Emulator, word uint16) (cycles int) {
+	panic("doSTD_Y: unimplemented")
+}
+
+// store using pointer Z (post-increment)
+func doST_Z_INC(em *Emulator, word uint16) (cycles int) {
+	panic("doST_Z_INC: unimplemented")
+}
+
+// store using pointer Z (pre-decrement)
+func doST_Z_DEC(em *Emulator, word uint16) (cycles int) {
+	panic("doST_Z_DEC: unimplemented")
+}
+
+// store using pointer Z with displacement
+func doSTD_Z(em *Emulator, word uint16) (cycles int) {
+	panic("doSTD_Z: unimplemented")
 }
