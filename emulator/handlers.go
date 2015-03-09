@@ -85,6 +85,7 @@ var handlers = [...]instHandler{
 	doSBI,
 	doSBIC,
 	doSBIS,
+	doSBIW,
 }
 
 func init() {
@@ -1327,4 +1328,26 @@ func doSBIS(em *Emulator, word uint16) (cycles int) {
 	} else {
 		return cycles
 	}
+}
+
+// subtract immediate from word
+func doSBIW(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := 24 + ((word & 0x0030) >> 3)
+	k := ((word & 0x00C0) >> 2) | (word & 0x000F)
+	// get operands
+	a := (uint16(em.regs[d+1]) << 8) | uint16(em.regs[d])
+	// compute result
+	x := a - k
+	// set flags
+	v := a & ^x
+	em.flags[avr.FlagV] = uint8((v & 0x8000) >> 15)
+	em.flags[avr.FlagN] = uint8((x & 0x8000) >> 15)
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagC] = uint8((x & ^a & 0x8000) >> 15)
+	em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
+	// store result
+	em.regs[d+1] = uint8(x >> 8)
+	em.regs[d] = uint8(x)
+	return 2
 }

@@ -80,6 +80,7 @@ const (
     SBI
     SBIC
     SBIS
+    SBIW
     
     NumInstructions
 )
@@ -162,6 +163,7 @@ var instStrings = [...]string{
     "SBI",
     "SBIC",
     "SBIS",
+    "SBIW",
 }
 
 func init() {
