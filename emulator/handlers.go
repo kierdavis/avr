@@ -88,6 +88,7 @@ var handlers = [...]instHandler{
 	doSBIW,
 	doSBRC,
 	doSBRS,
+	doSLEEP,
 }
 
 func init() {
@@ -1374,4 +1375,10 @@ func doSBRS(em *Emulator, word uint16) (cycles int) {
 	} else {
 		return 1
 	}
+}
+
+// enter sleep mode
+func doSLEEP(em *Emulator, word uint16) (cycles int) {
+	panic("doSLEEP: unimplemented")
+	return 1
 }

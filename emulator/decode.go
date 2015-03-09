@@ -124,6 +124,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.ICALL
     case word        == 0x9519:
         return avr.EICALL
+    case word        == 0x9588:
+        return avr.SLEEP
     case word        == 0x9598:
         return avr.BREAK
     case word        == 0x95C8:
