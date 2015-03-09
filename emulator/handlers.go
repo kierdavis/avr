@@ -528,7 +528,7 @@ func doFMUL(em *Emulator, word uint16) (cycles int) {
 	// extract instruction fields
 	d := 16 + ((word & 0x0070) >> 4)
 	r := 16 + (word & 0x0007)
-	// get operads
+	// get operands
 	a := em.regs[d]
 	b := em.regs[r]
 	// compute result
@@ -549,7 +549,7 @@ func doFMULS(em *Emulator, word uint16) (cycles int) {
 	// extract instruction fields
 	d := 16 + ((word & 0x0070) >> 4)
 	r := 16 + (word & 0x0007)
-	// get operads
+	// get operands
 	a := int8(em.regs[d])
 	b := int8(em.regs[r])
 	// compute result
@@ -570,7 +570,7 @@ func doFMULSU(em *Emulator, word uint16) (cycles int) {
 	// extract instruction fields
 	d := 16 + ((word & 0x0070) >> 4)
 	r := 16 + (word & 0x0007)
-	// get operads
+	// get operands
 	a := int8(em.regs[d])
 	b := em.regs[r]
 	// compute result
@@ -998,7 +998,7 @@ func doMUL(em *Emulator, word uint16) (cycles int) {
 	// extract instruction fields
 	d := (word & 0x01F0) >> 4
 	r := ((word & 0x0200) >> 5) | (word & 0x000F)
-	// get operads
+	// get operands
 	a := em.regs[d]
 	b := em.regs[r]
 	// compute result
@@ -1017,7 +1017,7 @@ func doMULS(em *Emulator, word uint16) (cycles int) {
 	// extract instruction fields
 	d := 16 + ((word & 0x00F0) >> 4)
 	r := 16 + (word & 0x000F)
-	// get operads
+	// get operands
 	a := int8(em.regs[d])
 	b := int8(em.regs[r])
 	// compute result
@@ -1036,7 +1036,7 @@ func doMULSU(em *Emulator, word uint16) (cycles int) {
 	// extract instruction fields
 	d := 16 + ((word & 0x0070) >> 4)
 	r := 16 + (word & 0x0007)
-	// get operads
+	// get operands
 	a := int8(em.regs[d])
 	b := em.regs[r]
 	// compute result
