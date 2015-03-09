@@ -100,6 +100,7 @@ var handlers = [...]instHandler{
 	doST_Z_INC,
 	doST_Z_DEC,
 	doSTD_Z,
+	doSTS,
 }
 
 func init() {
@@ -1533,4 +1534,18 @@ func doST_Z_DEC(em *Emulator, word uint16) (cycles int) {
 // store using pointer Z with displacement
 func doSTD_Z(em *Emulator, word uint16) (cycles int) {
 	return doGenericStore(em, word, 'd', 30, &em.rampy)
+}
+
+// store to literal address
+func doSTS(em *Emulator, word uint16) (cycles int) {
+	d := (word & 0x01F0) >> 4
+	k := em.fetchProgWord()
+	
+	if em.Spec.LogDataSpaceSize > 16 {
+		//addr = k | (em.rampd << 16)
+		panic("doSTS: devices with a data space size > 16 not yet fully implemented")
+	}
+	
+	em.storeDataByte(k, em.regs[d])
+	return 2
 }

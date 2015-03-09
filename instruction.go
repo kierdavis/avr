@@ -95,6 +95,7 @@ const (
     ST_Z_INC
     ST_Z_DEC
     STD_Z
+    STS
     
     NumInstructions
 )
@@ -192,6 +193,7 @@ var instStrings = [...]string{
     "ST_Z_INC",
     "ST_Z_DEC",
     "STD_Z",
+    "STS",
 }
 
 func init() {
