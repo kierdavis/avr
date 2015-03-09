@@ -152,8 +152,7 @@ func doADIW(em *Emulator, word uint16) (cycles int) {
 	// compute result
 	x := a + k
 	// set flags
-	v := ^a & x
-	em.flags[avr.FlagV] = uint8((v & 0x8000) >> 15)
+	em.flags[avr.FlagV] = uint8((^a & x & 0x8000) >> 15)
 	em.flags[avr.FlagN] = uint8((x & 0x8000) >> 15)
 	em.flags[avr.FlagZ] = b2i(x == 0)
 	em.flags[avr.FlagC] = uint8((^x & a & 0x8000) >> 15)
@@ -1340,8 +1339,7 @@ func doSBIW(em *Emulator, word uint16) (cycles int) {
 	// compute result
 	x := a - k
 	// set flags
-	v := a & ^x
-	em.flags[avr.FlagV] = uint8((v & 0x8000) >> 15)
+	em.flags[avr.FlagV] = uint8((a & ^x & 0x8000) >> 15)
 	em.flags[avr.FlagN] = uint8((x & 0x8000) >> 15)
 	em.flags[avr.FlagZ] = b2i(x == 0)
 	em.flags[avr.FlagC] = uint8((x & ^a & 0x8000) >> 15)
