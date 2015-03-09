@@ -1406,47 +1406,131 @@ func doSPM_2(em *Emulator, word uint16) (cycles int) {
 	return 1
 }
 
+// Generalisation across all ST/STD implementations
+// Params:
+//   mode: one of ' ' -- unadorned ST
+//                '+' -- post-increment ST
+//                '-' -- pre-decrement ST
+//                'd' -- additional displacement (STD)
+//   ptrLoReg: number of low register used for pointer (X => 26, Y => 28, Z => 30)
+//             ptrHiReg is implied to be ptrLoReg+1 (X => 27, Y => 29, Z => 31)
+//   ptrExt: reference to either em.rampx, em.rampy or em.rampz, depending on the pointer used.
+func doGenericStore(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *uint8) (cycles int) {
+	ptrHiReg := ptrLoReg + 1
+	d := (word & 0x01F0) >> 4
+	
+	var addr uint16
+	
+	// Get the addr
+	if em.Spec.LogDataSpaceSize > 16 {
+		// Address is RAMP?:Rh:Rl
+		panic("doGenericStore: devices with a data space size > 16 not yet fully implemented")
+	} else if em.Spec.LogDataSpaceSize > 8 {
+		// Address is Rh:Rl
+		addr = (uint16(em.regs[ptrHiReg]) << 8) | uint16(em.regs[ptrLoReg])
+	} else {
+		// Address is Rl
+		addr = uint16(em.regs[ptrLoReg])
+	}
+	
+	// Handle additional displacement
+	if mode == 'd' {
+		d := ((word & 0x2000) >> 8) | ((word & 0x0C00) >> 7) | (word & 0x0007)
+		addr += d
+	}
+	
+	// Handle pre-decrement
+	if mode == '-' {
+		addr--
+	}
+	
+	// Do the store
+	em.storeDataByte(addr, em.regs[d])
+	
+	// Handle post-increment
+	if mode == '+' {
+		addr++
+	}
+	
+	// Write back the addr if needed
+	if mode == '+' || mode == '-' {
+		if em.Spec.LogDataSpaceSize > 16 {
+			// Address is RAMP?:Rh:Rl
+			panic("doGenericStore: devices with a data space size > 16 not yet fully implemented")
+		} else if em.Spec.LogDataSpaceSize > 8 {
+			// Address is Rh:Rl
+			em.regs[ptrHiReg] = uint8(addr >> 8)
+			em.regs[ptrLoReg] = uint8(addr)
+		} else {
+			// Address is Rl
+			em.regs[ptrLoReg] = uint8(addr)
+		}
+	}
+	
+	// Compute number of cycles
+	// This is not fully compliant with the spec, but the spec has too many
+	// special cases for full compliance to be worth it.
+	if em.Spec.Family == spec.XMEGA {
+		if mode == '-' || mode == 'd' {
+			cycles = 2
+		} else {
+			cycles = 1
+		}
+		
+		return cycles
+	
+	} else {
+		if mode == '-' {
+			cycles = 2
+		} else {
+			cycles = 1
+		}
+		
+		return cycles
+	}
+}
+
 // store using pointer X
 func doST_X(em *Emulator, word uint16) (cycles int) {
-	panic("doST_X: unimplemented")
+	return doGenericStore(em, word, ' ', 26, &em.rampx)
 }
 
 // store using pointer X (post-increment)
 func doST_X_INC(em *Emulator, word uint16) (cycles int) {
-	panic("doST_X_INC: unimplemented")
+	return doGenericStore(em, word, '+', 26, &em.rampx)
 }
 
 // store using pointer X (pre-decrement)
 func doST_X_DEC(em *Emulator, word uint16) (cycles int) {
-	panic("doST_X_DEC: unimplemented")
+	return doGenericStore(em, word, '-', 26, &em.rampx)
 }
 
 // store using pointer Y (post-increment)
 func doST_Y_INC(em *Emulator, word uint16) (cycles int) {
-	panic("doST_Y_INC: unimplemented")
+	return doGenericStore(em, word, '+', 28, &em.rampy)
 }
 
 // store using pointer Y (pre-decrement)
 func doST_Y_DEC(em *Emulator, word uint16) (cycles int) {
-	panic("doST_Y_DEC: unimplemented")
+	return doGenericStore(em, word, '-', 28, &em.rampy)
 }
 
 // store using pointer Y with displacement
 func doSTD_Y(em *Emulator, word uint16) (cycles int) {
-	panic("doSTD_Y: unimplemented")
+	return doGenericStore(em, word, 'd', 28, &em.rampy)
 }
 
 // store using pointer Z (post-increment)
 func doST_Z_INC(em *Emulator, word uint16) (cycles int) {
-	panic("doST_Z_INC: unimplemented")
+	return doGenericStore(em, word, '+', 30, &em.rampy)
 }
 
 // store using pointer Z (pre-decrement)
 func doST_Z_DEC(em *Emulator, word uint16) (cycles int) {
-	panic("doST_Z_DEC: unimplemented")
+	return doGenericStore(em, word, '-', 30, &em.rampy)
 }
 
 // store using pointer Z with displacement
 func doSTD_Z(em *Emulator, word uint16) (cycles int) {
-	panic("doSTD_Z: unimplemented")
+	return doGenericStore(em, word, 'd', 30, &em.rampy)
 }
