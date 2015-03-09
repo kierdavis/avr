@@ -138,6 +138,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.SBIC
     case word&0xFF00 == 0x9A00:
         return avr.SBI
+    case word&0xFF00 == 0x9B00:
+        return avr.SBIS
     case word&0xFC00 == 0x9C00:
         return avr.MUL
     case word&0xF800 == 0xA000 && reducedCore:

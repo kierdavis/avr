@@ -84,6 +84,7 @@ var handlers = [...]instHandler{
 	doSBCI,
 	doSBI,
 	doSBIC,
+	doSBIS,
 }
 
 func init() {
@@ -1297,6 +1298,25 @@ func doSBIC(em *Emulator, word uint16) (cycles int) {
 	
 	x := em.readPort(0, a)
 	if (x >> b) & 1 == 0 {
+		cycles = em.skip() + 1
+	} else {
+		cycles = 1
+	}
+	
+	if em.Spec.Family == spec.XMEGA {
+		return cycles + 1
+	} else {
+		return cycles
+	}
+}
+
+// skip if bit in I/O port is set
+func doSBIS(em *Emulator, word uint16) (cycles int) {
+	a := (word & 0x00F8) >> 3
+	b := word & 0x0007
+	
+	x := em.readPort(0, a)
+	if (x >> b) & 1 != 0 {
 		cycles = em.skip() + 1
 	} else {
 		cycles = 1
