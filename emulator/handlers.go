@@ -63,6 +63,7 @@ var handlers = [...]instHandler{
 	doLPM,
 	doLPM_INC,
 	doLSR,
+	doMOV,
 }
 
 func init() {
@@ -968,5 +969,13 @@ func doLSR(em *Emulator, word uint16) (cycles int) {
 	em.flags[avr.FlagS] = em.flags[avr.FlagC]
 	// store result
 	em.regs[d] = x
+	return 1
+}
+
+// move
+func doMOV(em *Emulator, word uint16) (cycles int) {
+	d := (word & 0x01F0) >> 4
+	r := ((word & 0x0200) >> 5) | (word & 0x000F)
+	em.regs[d] = em.regs[r]
 	return 1
 }

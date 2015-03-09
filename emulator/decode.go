@@ -28,6 +28,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.AND
     case word&0xFC00 == 0x2400:
         return avr.EOR
+    case word&0xFC00 == 0x2C00:
+        return avr.MOV
     case word&0xF000 == 0x3000:
         return avr.CPI
     case word&0xF000 == 0x7000:
