@@ -86,6 +86,8 @@ var handlers = [...]instHandler{
 	doSBIC,
 	doSBIS,
 	doSBIW,
+	doSBRC,
+	doSBRS,
 }
 
 func init() {
@@ -1348,4 +1350,28 @@ func doSBIW(em *Emulator, word uint16) (cycles int) {
 	em.regs[d+1] = uint8(x >> 8)
 	em.regs[d] = uint8(x)
 	return 2
+}
+
+// skip if bit in register is cleared
+func doSBRC(em *Emulator, word uint16) (cycles int) {
+	r := (word & 0x01F0) >> 4
+	b := word & 0x0007
+	
+	if (em.regs[r] >> b) & 1 == 0 {
+		return em.skip() + 1
+	} else {
+		return 1
+	}
+}
+
+// skip if bit in register is set
+func doSBRS(em *Emulator, word uint16) (cycles int) {
+	r := (word & 0x01F0) >> 4
+	b := word & 0x0007
+	
+	if (em.regs[r] >> b) & 1 != 0 {
+		return em.skip() + 1
+	} else {
+		return 1
+	}
 }

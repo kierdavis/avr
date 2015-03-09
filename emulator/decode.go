@@ -164,6 +164,10 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.BLD
     case word&0xFE08 == 0xFA00:
         return avr.BST
+    case word&0xFE08 == 0xFC00:
+        return avr.SBRC
+    case word&0xFE08 == 0xFE00:
+        return avr.SBRS
     default:
         return -1
     }
