@@ -3,7 +3,6 @@ To-do list
 
 ## Short term
 
-* Finish implementing instruction set.
 * Finalise `ATmega48/88/168` and `ATtiny4/5/9/10` specs by adding a `Supports`
   field.
 
