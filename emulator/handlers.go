@@ -53,6 +53,9 @@ var handlers = [...]instHandler{
 	doLD_Y_INC,
 	doLD_Y_DEC,
 	doLDD_Y,
+	doLD_Z_INC,
+	doLD_Z_DEC,
+	doLDD_Z,
 }
 
 func init() {
@@ -751,7 +754,7 @@ func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *u
 	// This is not fully compliant with the spec, but the spec has too many
 	// special cases for full compliance to be worth it.
 	if em.Spec.Family == spec.XMEGA {
-		if mode == '-' {
+		if mode == '-' || mode == 'd' {
 			cycles = 2
 		} else {
 			cycles = 1
@@ -794,4 +797,16 @@ func doLD_Y_DEC(em *Emulator, word uint16) (cycles int) {
 
 func doLDD_Y(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, 'd', 28, &em.rampy)
+}
+
+func doLD_Z_INC(em *Emulator, word uint16) (cycles int) {
+	return doGenericLoad(em, word, '+', 30, &em.rampz)
+}
+
+func doLD_Z_DEC(em *Emulator, word uint16) (cycles int) {
+	return doGenericLoad(em, word, '-', 30, &em.rampz)
+}
+
+func doLDD_Z(em *Emulator, word uint16) (cycles int) {
+	return doGenericLoad(em, word, 'd', 30, &em.rampz)
 }
