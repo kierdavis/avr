@@ -126,6 +126,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.LDS_SHORT
     case word&0xF800 == 0xB000:
         return avr.IN
+    case word&0xF800 == 0xB800:
+        return avr.OUT
     case word&0xF000 == 0xE000:
         return avr.LDI
     case word&0xFC00 == 0xF000:

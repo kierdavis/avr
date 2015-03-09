@@ -72,6 +72,7 @@ var handlers = [...]instHandler{
 	doNOP,
 	doOR,
 	doORI,
+	doOUT,
 }
 
 func init() {
@@ -1115,5 +1116,13 @@ func doORI(em *Emulator, word uint16) (cycles int) {
 	em.flags[avr.FlagS] = em.flags[avr.FlagN]
 	// store result
 	em.regs[d] = x
+	return 1
+}
+
+// write IO port
+func doOUT(em *Emulator, word uint16) (cycles int) {
+	r := (word & 0x01F0) >> 4
+	a := ((word & 0x0600) >> 5) | (word & 0x000F)
+	em.writePort(0, a, em.regs[r])
 	return 1
 }

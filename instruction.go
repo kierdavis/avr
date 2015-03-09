@@ -67,6 +67,7 @@ const (
     NOP
     OR
     ORI
+    OUT
     
     NumInstructions
 )
@@ -136,6 +137,7 @@ var instStrings = [...]string{
     "NOP",
     "OR",
     "ORI",
+    "OUT",
 }
 
 func init() {
