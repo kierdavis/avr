@@ -1153,7 +1153,7 @@ func doPUSH(em *Emulator, word uint16) (cycles int) {
 func doRCALL(em *Emulator, word uint16) (cycles int) {
 	k := int32(word & 0x0FFF)
 	// sign-extend from 12 to 32 bits
-	k = (k << 36) >> 36
+	k = (k << 20) >> 20
 	
 	// push PC
 	cycles = 3
