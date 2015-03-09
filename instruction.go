@@ -99,6 +99,8 @@ const (
     STS_SHORT
     SUB
     SUBI
+    SWAP
+    WDR
     
     NumInstructions
 )
@@ -200,6 +202,8 @@ var instStrings = [...]string{
     "STS_SHORT",
     "SUB",
     "SUBI",
+    "SWAP",
+    "WDR",
 }
 
 func init() {

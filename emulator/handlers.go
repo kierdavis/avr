@@ -104,6 +104,8 @@ var handlers = [...]instHandler{
 	doSTS_SHORT,
 	doSUB,
 	doSUBI,
+	doSWAP,
+	doWDR,
 }
 
 func init() {
@@ -1611,5 +1613,19 @@ func doSUBI(em *Emulator, word uint16) (cycles int) {
 	em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
 	// store result
 	em.regs[d] = x
+	return 1
+}
+
+// swap nibbles
+func doSWAP(em *Emulator, word uint16) (cycles int) {
+	d := (word & 0x01F0) >> 4
+	x := em.regs[d]
+	em.regs[d] = (x >> 4) | (x << 4)
+	return 1
+}
+
+// watchdog reset
+func doWDR(em *Emulator, word uint16) (cycles int) {
+	panic("doWDR: unimplemented")
 	return 1
 }

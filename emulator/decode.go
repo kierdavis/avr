@@ -116,6 +116,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.COM
     case word&0xFE0F == 0x9401:
         return avr.NEG
+    case word&0xFE0F == 0x9402:
+        return avr.SWAP
     case word&0xFE0F == 0x9403:
         return avr.INC
     case word&0xFE0F == 0x9405:
@@ -152,6 +154,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.SLEEP
     case word        == 0x9598:
         return avr.BREAK
+    case word        == 0x95A8:
+        return avr.WDR
     case word        == 0x95C8:
         return avr.LPM_R0
     case word        == 0x95D8:
