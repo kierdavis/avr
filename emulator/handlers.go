@@ -77,6 +77,7 @@ var handlers = [...]instHandler{
 	doPUSH,
 	doRCALL,
 	doRET,
+	doRETI,
 }
 
 func init() {
@@ -1173,6 +1174,18 @@ func doRCALL(em *Emulator, word uint16) (cycles int) {
 func doRET(em *Emulator, word uint16) (cycles int) {
 	em.popPC()
 	
+	if em.Spec.LogProgMemSize > 16 {
+		return 5
+	} else {
+		return 4
+	}
+}
+
+// return from interrupt
+func doRETI(em *Emulator, word uint16) (cycles int) {
+	em.popPC()
+	em.flags[avr.FlagI] = 1
+
 	if em.Spec.LogProgMemSize > 16 {
 		return 5
 	} else {

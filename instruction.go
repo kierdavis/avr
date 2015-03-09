@@ -72,6 +72,7 @@ const (
     PUSH
     RCALL
     RET
+    RETI
     
     NumInstructions
 )
@@ -146,6 +147,7 @@ var instStrings = [...]string{
     "PUSH",
     "RCALL",
     "RET",
+    "RETI",
 }
 
 func init() {

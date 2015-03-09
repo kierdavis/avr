@@ -112,6 +112,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.BCLR
     case word        == 0x9508:
         return avr.RET
+    case word        == 0x9518:
+        return avr.RETI
     case word        == 0x9509:
         return avr.ICALL
     case word        == 0x9519:
