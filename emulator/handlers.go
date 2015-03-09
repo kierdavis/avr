@@ -47,9 +47,9 @@ var handlers = [...]instHandler{
 	doLAC,
 	doLAS,
 	doLAT,
-	//doLD_X,
-	//doLD_X_INC,
-	//doLD_X_DEC,
+	doLD_X,
+	doLD_X_INC,
+	doLD_X_DEC,
 }
 
 func init() {
@@ -680,4 +680,87 @@ func doLAT(em *Emulator, word uint16) (cycles int) {
 	em.storeDataByte(z, y ^ x)
 	
 	return 1
+}
+
+// generalisation across all LD instances
+func doGenericLoad(em *Emulator, word uint16, postInc bool, preDec bool, ptrLoReg int, ptrHiReg int, ptrExt *uint8) (cycles int) {
+	d := (word & 0x01F0) >> 4
+	
+	var addr uint16
+	
+	// Get the addr
+	if em.Spec.LogDataSpaceSize > 16 {
+		// Address is RAMP?:Rh:Rl
+		panic("doGenericLoad: devices with a data space size > 16 not yet fully implemented")
+	} else if em.Spec.LogDataSpaceSize > 8 {
+		// Address is Rh:Rl
+		addr = (uint16(em.regs[ptrHiReg]) << 8) | uint16(em.regs[ptrLoReg])
+	} else {
+		// Address is Rl
+		addr = uint16(em.regs[ptrLoReg])
+	}
+	
+	// Handle pre-decrement
+	if preDec {
+		addr--
+	}
+	
+	// Do the load
+	em.regs[d] = em.loadDataByte(addr)
+	
+	// Handle post-increment
+	if postInc {
+		addr++
+	}
+	
+	// Write back the addr if needed
+	if postInc || preDec {
+		if em.Spec.LogDataSpaceSize > 16 {
+			// Address is RAMP?:Rh:Rl
+			panic("doGenericLoad: devices with a data space size > 16 not yet fully implemented")
+		} else if em.Spec.LogDataSpaceSize > 8 {
+			// Address is Rh:Rl
+			em.regs[ptrHiReg] = uint8(addr >> 8)
+			em.regs[ptrLoReg] = uint8(addr)
+		} else {
+			// Address is Rl
+			em.regs[ptrLoReg] = uint8(addr)
+		}
+	}
+	
+	// Compute number of cycles
+	// This is not fully compliant with the spec, but the spec has too many
+	// special cases for full compliance to be worth it.
+	if em.Spec.Family == spec.XMEGA {
+		if preDec {
+			cycles = 2
+		} else {
+			cycles = 1
+		}
+		
+		return cycles
+	
+	} else {
+		if postInc {
+			cycles = 2
+		} else if preDec {
+			cycles = 3
+		} else {
+			cycles = 1
+		}
+		
+		return cycles
+	}
+}
+
+func doLD_X(em *Emulator, word uint16) (cycles int) {
+	return doGenericLoad(em, word, false, false, 26, 27, &em.rampx)
+}
+
+func doLD_X_INC(em *Emulator, word uint16) (cycles int) {
+	return doGenericLoad(em, word, true, false, 26, 27, &em.rampx)
+}
+
+func doLD_X_DEC(em *Emulator, word uint16) (cycles int) {
+	return doGenericLoad(em, word, false, true, 26, 27, &em.rampx)
 }
