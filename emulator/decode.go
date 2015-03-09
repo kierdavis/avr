@@ -94,6 +94,8 @@ func Decode(word uint16) avr.Instruction {
         return avr.CBI
     case word&0xF800 == 0xB000:
         return avr.IN
+    case word&0xF000 == 0xE000:
+        return avr.LDI
     case word&0xFC00 == 0xF000:
         return avr.BRBS
     case word&0xFC00 == 0xF400:

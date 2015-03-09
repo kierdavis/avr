@@ -56,6 +56,7 @@ var handlers = [...]instHandler{
 	doLD_Z_INC,
 	doLD_Z_DEC,
 	doLDD_Z,
+	doLDI,
 }
 
 func init() {
@@ -809,4 +810,11 @@ func doLD_Z_DEC(em *Emulator, word uint16) (cycles int) {
 
 func doLDD_Z(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, 'd', 30, &em.rampz)
+}
+
+func doLDI(em *Emulator, word uint16) (cycles int) {
+	k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
+	d := 16 + ((word & 0x00F0) >> 4)
+	em.regs[d] = k
+	return 1
 }
