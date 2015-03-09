@@ -67,13 +67,14 @@ func tiny4_5_9_10(v int) *MCUSpec {
     }
 
     return linkRegions(&MCUSpec{
-        Label:          fmt.Sprintf("ATtiny%d", v),
-        Family:         ReducedCore,
-        NumRegs:        32, // technically only 16, but the 16 that are implemented are r16-r31
-        LogProgMemSize: logProgMemSize,
-        LogRAMSize:     5, // 32 B
-        LogEEPROMSize:  0, // none
-        IOBankSizes:    []uint{64},
+        Label:            fmt.Sprintf("ATtiny%d", v),
+        Family:           ReducedCore,
+        NumRegs:          32, // technically only 16, but the 16 that are implemented are r16-r31
+        LogProgMemSize:   logProgMemSize,
+        LogDataSpaceSize: 7, // data memory address width
+        LogRAMSize:       5, // 32 B
+        LogEEPROMSize:    0, // none
+        IOBankSizes:      []uint{64},
         Regions: []RegionSpec{
             IORegionSpec{start: 0x0000, bankNum: 0},
             RAMRegionSpec{start: 0x0040},

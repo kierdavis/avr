@@ -100,30 +100,34 @@ func mega48_88_168(v int) *MCUSpec {
 		ports["GTCCR"] = avr.PortRef{0, 0x23}
 	}
 
-	var logProgMemSize, logRAMSize, logEEPROMSize uint
+	var logProgMemSize, logDataSpaceSize, logRAMSize, logEEPROMSize uint
 	switch v {
 	case 48:
 		logProgMemSize = 11 // 2 kW (4 kB)
+		logDataSpaceSize = 10
 		logRAMSize = 9      // 512 B
 		logEEPROMSize = 8   // 256 B
 	case 88:
 		logProgMemSize = 12 // 4 kW (8 kB)
+		logDataSpaceSize = 11
 		logRAMSize = 10     // 1 kB
 		logEEPROMSize = 9   // 512 B
 	case 168:
 		logProgMemSize = 13 // 8 kW (16 kB)
+		logDataSpaceSize = 11
 		logRAMSize = 10     // 1 kB
 		logEEPROMSize = 9   // 512 B
 	}
 
 	return linkRegions(&MCUSpec{
-		Label:          fmt.Sprintf("ATmega%d", v),
-		Family:         EnhancedCore128K,
-		NumRegs:        32,
-		LogProgMemSize: logProgMemSize,
-		LogRAMSize:     logRAMSize,
-		LogEEPROMSize:  logEEPROMSize,
-		IOBankSizes:    []uint{64, 160},
+		Label:            fmt.Sprintf("ATmega%d", v),
+		Family:           EnhancedCore128K,
+		NumRegs:          32,
+		LogProgMemSize:   logProgMemSize,
+		LogDataSpaceSize: logDataSpaceSize, // data memory address width
+		LogRAMSize:       logRAMSize,
+		LogEEPROMSize:    logEEPROMSize,
+		IOBankSizes:      []uint{64, 160},
 		Regions: []RegionSpec{
 			RegsRegionSpec{start: 0x0000},
 			IORegionSpec{start: 0x0020, bankNum: 0},

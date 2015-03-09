@@ -21,16 +21,17 @@ const (
 
 // An MCUSpec is a specification of a particular AVR variant.
 type MCUSpec struct {
-	Label          string
-	Family         MCUFamily
-	NumRegs        uint
-	LogProgMemSize uint
-	LogRAMSize     uint
-	LogEEPROMSize  uint
-	IOBankSizes    []uint
-	Regions        []RegionSpec
-	Ports          map[string]avr.PortRef
-	Available      [avr.NumInstructions]bool
+	Label            string
+	Family           MCUFamily
+	NumRegs          uint
+	LogProgMemSize   uint
+	LogDataSpaceSize uint
+	LogRAMSize       uint
+	LogEEPROMSize    uint
+	IOBankSizes      []uint
+	Regions          []RegionSpec
+	Ports            map[string]avr.PortRef
+	Available        [avr.NumInstructions]bool
 }
 
 // A RegionSpec is a specification of a region of data memory pertaining to a
