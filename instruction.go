@@ -68,6 +68,8 @@ const (
     OR
     ORI
     OUT
+    POP
+    PUSH
     
     NumInstructions
 )
@@ -138,6 +140,8 @@ var instStrings = [...]string{
     "OR",
     "ORI",
     "OUT",
+    "POP",
+    "PUSH",
 }
 
 func init() {

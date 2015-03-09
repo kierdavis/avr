@@ -73,6 +73,8 @@ var handlers = [...]instHandler{
 	doOR,
 	doORI,
 	doOUT,
+	doPOP,
+	doPUSH,
 }
 
 func init() {
@@ -1125,4 +1127,23 @@ func doOUT(em *Emulator, word uint16) (cycles int) {
 	a := ((word & 0x0600) >> 5) | (word & 0x000F)
 	em.writePort(0, a, em.regs[r])
 	return 1
+}
+
+// pop register from stack
+func doPOP(em *Emulator, word uint16) (cycles int) {
+	d := (word & 0x01F0) >> 4
+	em.regs[d] = em.pop()
+	return 2
+}
+
+// push register to stack
+func doPUSH(em *Emulator, word uint16) (cycles int) {
+	d := (word & 0x01F0) >> 4
+	em.push(em.regs[d])
+	
+	if em.Spec.Family == spec.XMEGA {
+		return 1
+	} else {
+		return 2
+	}
 }
