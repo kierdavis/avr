@@ -642,13 +642,25 @@ func doLAC(em *Emulator, word uint16) (cycles int) {
 	// [Z] <- [Z] & ~(old value of Rd)
 	
 	d := (word & 0x01F0) >> 4
-	z := (uint16(em.regs[31]) << 8) | uint16(em.regs[30])
+
+	var addr uint16
+	
+	if em.Spec.LogDataSpaceSize > 16 {
+		// Address is RAMPZ:R31:R30
+		panic("doLAC: devices with a data space size > 16 not yet fully implemented")
+	} else if em.Spec.LogDataSpaceSize > 8 {
+		// Address is R31:R30
+		addr = (uint16(em.regs[31]) << 8) | uint16(em.regs[30])
+	} else {
+		// Address is R30
+		addr = uint16(em.regs[30])
+	}
 	
 	x := em.regs[d]
-	y := em.loadDataByte(z)
+	y := em.loadDataByte(addr)
 	
 	em.regs[d] = y
-	em.storeDataByte(z, y & ^x)
+	em.storeDataByte(addr, y & ^x)
 	
 	return 1
 }
@@ -660,13 +672,25 @@ func doLAS(em *Emulator, word uint16) (cycles int) {
 	// [Z] <- [Z] | old value of Rd
 	
 	d := (word & 0x01F0) >> 4
-	z := (uint16(em.regs[31]) << 8) | uint16(em.regs[30])
+
+	var addr uint16
+	
+	if em.Spec.LogDataSpaceSize > 16 {
+		// Address is RAMPZ:R31:R30
+		panic("doLAS: devices with a data space size > 16 not yet fully implemented")
+	} else if em.Spec.LogDataSpaceSize > 8 {
+		// Address is R31:R30
+		addr = (uint16(em.regs[31]) << 8) | uint16(em.regs[30])
+	} else {
+		// Address is R30
+		addr = uint16(em.regs[30])
+	}
 	
 	x := em.regs[d]
-	y := em.loadDataByte(z)
+	y := em.loadDataByte(addr)
 	
 	em.regs[d] = y
-	em.storeDataByte(z, y | x)
+	em.storeDataByte(addr, y | x)
 	
 	return 1
 }
@@ -678,13 +702,25 @@ func doLAT(em *Emulator, word uint16) (cycles int) {
 	// [Z] <- [Z] ^ old value of Rd
 	
 	d := (word & 0x01F0) >> 4
-	z := (uint16(em.regs[31]) << 8) | uint16(em.regs[30])
+
+	var addr uint16
+	
+	if em.Spec.LogDataSpaceSize > 16 {
+		// Address is RAMPZ:R31:R30
+		panic("doLAT: devices with a data space size > 16 not yet fully implemented")
+	} else if em.Spec.LogDataSpaceSize > 8 {
+		// Address is R31:R30
+		addr = (uint16(em.regs[31]) << 8) | uint16(em.regs[30])
+	} else {
+		// Address is R30
+		addr = uint16(em.regs[30])
+	}
 	
 	x := em.regs[d]
-	y := em.loadDataByte(z)
+	y := em.loadDataByte(addr)
 	
 	em.regs[d] = y
-	em.storeDataByte(z, y ^ x)
+	em.storeDataByte(addr, y ^ x)
 	
 	return 1
 }
