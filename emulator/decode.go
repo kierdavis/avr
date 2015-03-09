@@ -32,6 +32,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.CPSE
     case word&0xFC00 == 0x1400:
         return avr.CP
+    case word&0xFC00 == 0x1800:
+        return avr.SUB
     case word&0xFC00 == 0x1C00:
         return avr.ADC
     case word&0xFC00 == 0x2000:
@@ -46,6 +48,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.CPI
     case word&0xF000 == 0x4000:
         return avr.SBCI
+    case word&0xF000 == 0x5000:
+        return avr.SUBI
     case word&0xF000 == 0x6000:
         return avr.ORI
     case word&0xF000 == 0x7000:

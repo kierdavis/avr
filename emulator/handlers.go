@@ -102,6 +102,8 @@ var handlers = [...]instHandler{
 	doSTD_Z,
 	doSTS,
 	doSTS_SHORT,
+	doSUB,
+	doSUBI,
 }
 
 func init() {
@@ -1562,5 +1564,52 @@ func doSTS_SHORT(em *Emulator, word uint16) (cycles int) {
 	}
 	
 	em.storeDataByte(k, em.regs[d])
+	return 1
+}
+
+// subtract
+func doSUB(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := (word & 0x01F0) >> 4
+	r := ((word & 0x0200) >> 5) | (word & 0x000F)
+	// get operands
+	a := em.regs[d]
+	b := em.regs[r]
+	// compute result
+	x := a - b
+	// set flags
+	c := (^a & b) | (b & x) | (x & ^a)
+	v := (a & ^b & ^x) | (^a & b & x)
+	em.flags[avr.FlagH] = (c & 0x08) >> 3
+	em.flags[avr.FlagV] = (v & 0x80) >> 7
+	em.flags[avr.FlagN] = (x & 0x80) >> 7
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagC] = (c & 0x80) >> 7
+	em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
+	// store result
+	em.regs[d] = x
+	return 1
+}
+
+// subtract immedate
+func doSUBI(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := 16 + ((word & 0x00F0) >> 4)
+	k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
+	// get operands
+	a := em.regs[d]
+	// compute result
+	x := a - k
+	// set flags
+	c := (^a & k) | (k & x) | (x & ^a)
+	v := (a & ^k & ^x) | (^a & k & x)
+	em.flags[avr.FlagH] = (c & 0x08) >> 3
+	em.flags[avr.FlagV] = (v & 0x80) >> 7
+	em.flags[avr.FlagN] = (x & 0x80) >> 7
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagC] = (c & 0x80) >> 7
+	em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
+	// store result
+	em.regs[d] = x
 	return 1
 }
