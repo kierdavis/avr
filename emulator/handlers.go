@@ -75,6 +75,7 @@ var handlers = [...]instHandler{
 	doOUT,
 	doPOP,
 	doPUSH,
+	doRCALL,
 }
 
 func init() {
@@ -1145,5 +1146,35 @@ func doPUSH(em *Emulator, word uint16) (cycles int) {
 		return 1
 	} else {
 		return 2
+	}
+}
+
+// relative call
+func doRCALL(em *Emulator, word uint16) (cycles int) {
+	k := int32(word & 0x0FFF)
+	// sign-extend from 12 to 32 bits
+	k = (k << 36) >> 36
+	
+	// push PC
+	cycles = 3
+
+	if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
+		em.push(uint8(em.pc >> 16))
+		cycles++
+	}
+
+	em.push(uint8(em.pc >> 8))
+	em.push(uint8(em.pc))
+	
+	// do the jump
+	em.pc += uint32(k)
+	
+	// compute cycles
+	if em.Spec.Family == spec.ReducedCore {
+		return 4
+	} else if em.Spec.Family == spec.XMEGA {
+		return cycles - 1
+	} else {
+		return cycles
 	}
 }
