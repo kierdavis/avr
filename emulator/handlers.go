@@ -62,6 +62,7 @@ var handlers = [...]instHandler{
 	doLPM_R0,
 	doLPM,
 	doLPM_INC,
+	doLSR,
 }
 
 func init() {
@@ -949,4 +950,23 @@ func doLPM_INC(em *Emulator, word uint16) (cycles int) {
 	em.regs[30] = uint8(addr)
 	
 	return 3
+}
+
+// logical shift right
+func doLSR(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := (word & 0x01F0) >> 4
+	// get operands
+	a := em.regs[d]
+	// compute result
+	x := uint8(int8(a) >> 1)
+	// set flags
+	em.flags[avr.FlagN] = 0
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagC] = a & 0x01
+	em.flags[avr.FlagV] = em.flags[avr.FlagN] ^ em.flags[avr.FlagC]
+	em.flags[avr.FlagS] = em.flags[avr.FlagC]
+	// store result
+	em.regs[d] = x
+	return 1
 }
