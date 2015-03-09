@@ -84,6 +84,7 @@ const (
     SBRC
     SBRS
     SLEEP
+    SPM
     
     NumInstructions
 )
@@ -170,6 +171,7 @@ var instStrings = [...]string{
     "SBRC",
     "SBRS",
     "SLEEP",
+    "SPM",
 }
 
 func init() {

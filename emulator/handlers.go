@@ -89,6 +89,7 @@ var handlers = [...]instHandler{
 	doSBRC,
 	doSBRS,
 	doSLEEP,
+	doSPM,
 }
 
 func init() {
@@ -1380,5 +1381,11 @@ func doSBRS(em *Emulator, word uint16) (cycles int) {
 // enter sleep mode
 func doSLEEP(em *Emulator, word uint16) (cycles int) {
 	panic("doSLEEP: unimplemented")
+	return 1
+}
+
+// store program memory
+func doSPM(em *Emulator, word uint16) (cycles int) {
+	panic("doSPM: unimplemented")
 	return 1
 }
