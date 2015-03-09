@@ -57,6 +57,7 @@ var handlers = [...]instHandler{
 	doLD_Z_DEC,
 	doLDD_Z,
 	doLDI,
+	doLDS,
 }
 
 func init() {
@@ -736,7 +737,6 @@ func doLAT(em *Emulator, word uint16) (cycles int) {
 //   ptrExt: reference to either em.rampx, em.rampy or em.rampz, depending on the pointer used.
 func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *uint8) (cycles int) {
 	ptrHiReg := ptrLoReg + 1
-	
 	d := (word & 0x01F0) >> 4
 	
 	var addr uint16
@@ -853,4 +853,17 @@ func doLDI(em *Emulator, word uint16) (cycles int) {
 	d := 16 + ((word & 0x00F0) >> 4)
 	em.regs[d] = k
 	return 1
+}
+
+func doLDS(em *Emulator, word uint16) (cycles int) {
+	d := (word & 0x01F0) >> 4
+	k := em.fetchProgWord()
+	
+	if em.Spec.LogDataSpaceSize > 16 {
+		//addr = k | (em.rampd << 16)
+		panic("doGenericLoad: devices with a data space size > 16 not yet fully implemented")
+	}
+	
+	em.regs[d] = em.loadDataByte(k)
+	return 2
 }

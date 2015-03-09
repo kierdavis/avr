@@ -34,6 +34,8 @@ func Decode(word uint16) avr.Instruction {
         return avr.LDD_Z
     case word&0xD208 == 0x8008:
         return avr.LDD_Y
+    case word&0xFE0F == 0x9000:
+        return avr.LDS
     case word&0xFE0F == 0x9001:
         return avr.LD_Z_INC
     case word&0xFE0F == 0x9002:

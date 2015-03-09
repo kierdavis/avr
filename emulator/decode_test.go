@@ -107,6 +107,8 @@ var decodeTests = []decodeTest{
     decodeTest{0x8964, avr.LDD_Z},
     decodeTest{0xeb93, avr.LDI},
     decodeTest{0xeadd, avr.LDI},
+    decodeTest{0x9170, avr.LDS},
+    decodeTest{0x9190, avr.LDS},
 }
 
 func TestDecode(t *testing.T) {

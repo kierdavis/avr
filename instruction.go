@@ -52,6 +52,7 @@ const (
     LD_Z_DEC
     LDD_Z
     LDI
+    LDS
     
     NumInstructions
 )
@@ -107,6 +108,7 @@ func (inst Instruction) String() string {
     case LD_Z_DEC: return "LD_Z_DEC"
     case LDD_Z:    return "LDD_Z"
     case LDI:      return "LDI"
+    case LDS:      return "LDS"
     default:       return ""
     }
 }
