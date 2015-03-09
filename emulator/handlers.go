@@ -79,6 +79,7 @@ var handlers = [...]instHandler{
 	doRET,
 	doRETI,
 	doRJMP,
+	doROR,
 }
 
 func init() {
@@ -1204,4 +1205,23 @@ func doRJMP(em *Emulator, word uint16) (cycles int) {
 	em.pc += uint32(k)
 	
 	return 2
+}
+
+// rotate right through carry
+func doROR(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := (word & 0x01F0) >> 4
+	// get operands
+	a := em.regs[d]
+	// compute result
+	x := (a >> 1) | (em.flags[avr.FlagC] << 7)
+	// set flags
+	em.flags[avr.FlagN] = (x & 0x80) >> 7
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagC] = a & 0x01
+	em.flags[avr.FlagV] = em.flags[avr.FlagN] ^ em.flags[avr.FlagC]
+	em.flags[avr.FlagS] = em.flags[avr.FlagC]
+	// store result
+	em.regs[d] = x
+	return 1
 }

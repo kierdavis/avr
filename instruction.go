@@ -74,6 +74,7 @@ const (
     RET
     RETI
     RJMP
+    ROR
     
     NumInstructions
 )
@@ -150,6 +151,7 @@ var instStrings = [...]string{
     "RET",
     "RETI",
     "RJMP",
+    "ROR",
 }
 
 func init() {
