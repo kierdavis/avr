@@ -50,6 +50,9 @@ var handlers = [...]instHandler{
 	doLD_X,
 	doLD_X_INC,
 	doLD_X_DEC,
+	doLD_Y_INC,
+	doLD_Y_DEC,
+	doLDD_Y,
 }
 
 func init() {
@@ -682,8 +685,18 @@ func doLAT(em *Emulator, word uint16) (cycles int) {
 	return 1
 }
 
-// generalisation across all LD instances
-func doGenericLoad(em *Emulator, word uint16, postInc bool, preDec bool, ptrLoReg int, ptrHiReg int, ptrExt *uint8) (cycles int) {
+// Generalisation across all LD/LDD implementations
+// Params:
+//   mode: one of ' ' -- unadorned LD
+//                '+' -- post-increment LD
+//                '-' -- pre-decrement LD
+//                'd' -- additional displacement (LDD)
+//   ptrLoReg: number of low register used for pointer (X => 26, Y => 28, Z => 30)
+//             ptrHiReg is implied to be ptrLoReg+1 (X => 27, Y => 29, Z => 31)
+//   ptrExt: reference to either em.rampx, em.rampy or em.rampz, depending on the pointer used.
+func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *uint8) (cycles int) {
+	ptrHiReg := ptrLoReg + 1
+	
 	d := (word & 0x01F0) >> 4
 	
 	var addr uint16
@@ -700,8 +713,14 @@ func doGenericLoad(em *Emulator, word uint16, postInc bool, preDec bool, ptrLoRe
 		addr = uint16(em.regs[ptrLoReg])
 	}
 	
+	// Handle additional displacement
+	if mode == 'd' {
+		d := ((word & 0x2000) >> 8) | ((word & 0x0C00) >> 7) | (word & 0x0007)
+		addr += d
+	}
+	
 	// Handle pre-decrement
-	if preDec {
+	if mode == '-' {
 		addr--
 	}
 	
@@ -709,12 +728,12 @@ func doGenericLoad(em *Emulator, word uint16, postInc bool, preDec bool, ptrLoRe
 	em.regs[d] = em.loadDataByte(addr)
 	
 	// Handle post-increment
-	if postInc {
+	if mode == '+' {
 		addr++
 	}
 	
 	// Write back the addr if needed
-	if postInc || preDec {
+	if mode == '+' || mode == '-' {
 		if em.Spec.LogDataSpaceSize > 16 {
 			// Address is RAMP?:Rh:Rl
 			panic("doGenericLoad: devices with a data space size > 16 not yet fully implemented")
@@ -732,7 +751,7 @@ func doGenericLoad(em *Emulator, word uint16, postInc bool, preDec bool, ptrLoRe
 	// This is not fully compliant with the spec, but the spec has too many
 	// special cases for full compliance to be worth it.
 	if em.Spec.Family == spec.XMEGA {
-		if preDec {
+		if mode == '-' {
 			cycles = 2
 		} else {
 			cycles = 1
@@ -741,9 +760,9 @@ func doGenericLoad(em *Emulator, word uint16, postInc bool, preDec bool, ptrLoRe
 		return cycles
 	
 	} else {
-		if postInc {
+		if mode == '+' {
 			cycles = 2
-		} else if preDec {
+		} else if mode == '-' {
 			cycles = 3
 		} else {
 			cycles = 1
@@ -754,13 +773,25 @@ func doGenericLoad(em *Emulator, word uint16, postInc bool, preDec bool, ptrLoRe
 }
 
 func doLD_X(em *Emulator, word uint16) (cycles int) {
-	return doGenericLoad(em, word, false, false, 26, 27, &em.rampx)
+	return doGenericLoad(em, word, ' ', 26, &em.rampx)
 }
 
 func doLD_X_INC(em *Emulator, word uint16) (cycles int) {
-	return doGenericLoad(em, word, true, false, 26, 27, &em.rampx)
+	return doGenericLoad(em, word, '+', 26, &em.rampx)
 }
 
 func doLD_X_DEC(em *Emulator, word uint16) (cycles int) {
-	return doGenericLoad(em, word, false, true, 26, 27, &em.rampx)
+	return doGenericLoad(em, word, '-', 26, &em.rampx)
+}
+
+func doLD_Y_INC(em *Emulator, word uint16) (cycles int) {
+	return doGenericLoad(em, word, '+', 28, &em.rampy)
+}
+
+func doLD_Y_DEC(em *Emulator, word uint16) (cycles int) {
+	return doGenericLoad(em, word, '-', 28, &em.rampy)
+}
+
+func doLDD_Y(em *Emulator, word uint16) (cycles int) {
+	return doGenericLoad(em, word, 'd', 28, &em.rampy)
 }

@@ -30,10 +30,16 @@ func Decode(word uint16) avr.Instruction {
         return avr.CPI
     case word&0xF000 == 0x7000:
         return avr.ANDI
+    case word&0xD208 == 0x8008:
+        return avr.LDD_Y
     case word&0xFE0F == 0x9006:
         return avr.ELPM
     case word&0xFE0F == 0x9007:
         return avr.ELPM_INC
+    case word&0xFE0F == 0x9009:
+        return avr.LD_Y_INC
+    case word&0xFE0F == 0x900A:
+        return avr.LD_Y_DEC
     case word&0xFE0F == 0x900C:
         return avr.LD_X
     case word&0xFE0F == 0x900D:
