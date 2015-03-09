@@ -53,6 +53,7 @@ const (
     LDD_Z
     LDI
     LDS
+    LDS_SHORT
     
     NumInstructions
 )
