@@ -190,7 +190,7 @@ func doASR(em *Emulator, word uint16) (cycles int) {
 	// set flags
 	em.flags[avr.FlagN] = (x & 0x80) >> 7
 	em.flags[avr.FlagZ] = b2i(x == 0)
-	em.flags[avr.FlagC] = (a & 0x01) >> 7
+	em.flags[avr.FlagC] = a & 0x01
 	em.flags[avr.FlagV] = em.flags[avr.FlagN] ^ em.flags[avr.FlagC]
 	em.flags[avr.FlagS] = em.flags[avr.FlagC]
 	// store result
