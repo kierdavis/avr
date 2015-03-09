@@ -54,6 +54,9 @@ const (
     LDI
     LDS
     LDS_SHORT
+    LPM_R0
+    LPM
+    LPM_INC
     
     NumInstructions
 )
@@ -111,6 +114,9 @@ func (inst Instruction) String() string {
     case LDI:       return "LDI"
     case LDS:       return "LDS"
     case LDS_SHORT: return "LDS_SHORT"
+    case LPM_R0:    return "LPM_R0"
+    case LPM:       return "LPM"
+    case LPM_INC:   return "LPM_INC"
     default:        return ""
     }
 }

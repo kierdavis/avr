@@ -42,6 +42,10 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.LD_Z_INC
     case word&0xFE0F == 0x9002:
         return avr.LD_Z_DEC
+    case word&0xFE0F == 0x9004:
+        return avr.LPM
+    case word&0xFE0F == 0x9005:
+        return avr.LPM_INC
     case word&0xFE0F == 0x9006:
         return avr.ELPM
     case word&0xFE0F == 0x9007:
@@ -90,6 +94,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.EICALL
     case word        == 0x9598:
         return avr.BREAK
+    case word        == 0x95C8:
+        return avr.LPM_R0
     case word        == 0x95D8:
         return avr.ELPM_R0
     case word&0xFF00 == 0x9600:

@@ -59,6 +59,9 @@ var handlers = [...]instHandler{
 	doLDI,
 	doLDS,
 	doLDS_SHORT,
+	doLPM_R0,
+	doLPM,
+	doLPM_INC,
 }
 
 func init() {
@@ -880,4 +883,58 @@ func doLDS_SHORT(em *Emulator, word uint16) (cycles int) {
 	
 	em.regs[d] = em.loadDataByte(k)
 	return 2
+}
+
+// load from program memory (destinated implied to be r0)
+func doLPM_R0(em *Emulator, word uint16) (cycles int) {
+	addr := (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
+	x := em.prog[addr >> 1]
+	
+	// lowest bit of address is byte select
+	if addr & 1 != 0 {
+		em.regs[0] = uint8(x >> 8)
+	} else {
+		em.regs[0] = uint8(x)
+	}
+	
+	return 3
+}
+
+// load from program memory
+func doLPM(em *Emulator, word uint16) (cycles int) {
+	d := (word & 0x01F0) >> 4
+	
+	addr := (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
+	x := em.prog[addr >> 1]
+	
+	// lowest bit of address is byte select
+	if addr & 1 != 0 {
+		em.regs[d] = uint8(x >> 8)
+	} else {
+		em.regs[d] = uint8(x)
+	}
+	
+	return 3
+}
+
+// load from program memory (post-increment)
+func doLPM_INC(em *Emulator, word uint16) (cycles int) {
+	d := (word & 0x01F0) >> 4
+	
+	addr := (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
+	x := em.prog[addr >> 1]
+	
+	// lowest bit of address is byte select
+	if addr & 1 != 0 {
+		em.regs[d] = uint8(x >> 8)
+	} else {
+		em.regs[d] = uint8(x)
+	}
+	
+	// post-increment
+	addr++
+	em.regs[31] = uint8(addr >> 8)
+	em.regs[30] = uint8(addr)
+	
+	return 3
 }

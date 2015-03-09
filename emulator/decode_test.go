@@ -112,6 +112,11 @@ var decodeTests = []decodeTest{
     decodeTest{word: 0x9190, inst: avr.LDS},
     decodeTest{word: 0xa4fd, inst: avr.LDS_SHORT, reducedCore: true},
     decodeTest{word: 0xa688, inst: avr.LDS_SHORT, reducedCore: true},
+    decodeTest{word: 0x95C8, inst: avr.LPM_R0},
+    decodeTest{word: 0x9174, inst: avr.LPM},
+    decodeTest{word: 0x9084, inst: avr.LPM},
+    decodeTest{word: 0x90b5, inst: avr.LPM_INC},
+    decodeTest{word: 0x91f5, inst: avr.LPM_INC},
     // reducedCore also true for STS_SHORT
 }
 
