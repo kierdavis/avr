@@ -156,6 +156,8 @@ var decodeTests = []decodeTest{
     decodeTest{word: 0x4764, inst: avr.SBCI},
     decodeTest{word: 0x9aee, inst: avr.SBI},
     decodeTest{word: 0x9a08, inst: avr.SBI},
+    decodeTest{word: 0x99c2, inst: avr.SBIC},
+    decodeTest{word: 0x9957, inst: avr.SBIC},
     // reducedCore also true for STS_SHORT
     
     // TODO: add tests for opcodes that can resolve to two different instructions
