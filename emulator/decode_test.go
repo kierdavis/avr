@@ -147,7 +147,7 @@ var decodeTests = []decodeTest{
     decodeTest{word: 0x9508, inst: avr.RET},
     decodeTest{word: 0x9518, inst: avr.RETI},
     decodeTest{word: 0xc705, inst: avr.RJMP},
-    decodeTest{worD: 0xc064, inst: avr.RJMP},
+    decodeTest{word: 0xc064, inst: avr.RJMP},
     decodeTest{word: 0x9587, inst: avr.ROR},
     decodeTest{word: 0x9407, inst: avr.ROR},
     // reducedCore also true for STS_SHORT
