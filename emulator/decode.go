@@ -134,6 +134,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.ELPM_R0
     case word        == 0x95E8:
         return avr.SPM
+    case word        == 0x95F8:
+        return avr.SPM_2
     case word&0xFF00 == 0x9600:
         return avr.ADIW
     case word&0xFF00 == 0x9700:
