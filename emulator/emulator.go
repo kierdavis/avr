@@ -89,9 +89,11 @@ func (em *Emulator) UnregisterPortByName(name string) (ok bool) {
 }
 
 func (em *Emulator) Run(cycles int) {
+	reducedCore := em.Spec.Family == spec.ReducedCore
+	
 	for cycles > 0 {
 		word := em.fetchProgWord()
-		inst := Decode(word)
+		inst := Decode(word, reducedCore)
 		if inst < 0 {
 			em.warn(InvalidInstructionWarning{em.pc - 1, word})
 			cycles--
@@ -180,7 +182,7 @@ func (em *Emulator) writePort(bankNum uint, index uint16, val uint8) {
 // words were skipped.
 func (em *Emulator) skip() (cycles int) {
 	word := em.fetchProgWord()
-	inst := Decode(word)
+	inst := Decode(word, em.Spec.Family == spec.ReducedCore)
 	if inst.IsTwoWord() {
 		em.fetchProgWord()
 		return 2
