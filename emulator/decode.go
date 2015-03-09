@@ -172,6 +172,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.MUL
     case word&0xF800 == 0xA000 && reducedCore:
         return avr.LDS_SHORT
+    case word&0xF800 == 0xA800 && reducedCore:
+        return avr.STS_SHORT
     case word&0xF800 == 0xB000:
         return avr.IN
     case word&0xF800 == 0xB800:

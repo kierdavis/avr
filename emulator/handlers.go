@@ -101,6 +101,7 @@ var handlers = [...]instHandler{
 	doST_Z_DEC,
 	doSTD_Z,
 	doSTS,
+	doSTS_SHORT,
 }
 
 func init() {
@@ -1548,4 +1549,18 @@ func doSTS(em *Emulator, word uint16) (cycles int) {
 	
 	em.storeDataByte(k, em.regs[d])
 	return 2
+}
+
+// store to literal address (reduced core form of STS)
+func doSTS_SHORT(em *Emulator, word uint16) (cycles int) {
+	d := 16 + ((word & 0x00F0) >> 4)
+	k := ((^word & 0x0100) >> 1) | ((word & 0x0100) >> 2) | ((word & 0x0600) >> 5) | (word & 0x000F)
+	
+	if em.Spec.LogDataSpaceSize > 16 {
+		//addr = k | (em.rampd << 16)
+		panic("doSTS_SHORT: devices with a data space size > 16 not yet fully implemented")
+	}
+	
+	em.storeDataByte(k, em.regs[d])
+	return 1
 }
