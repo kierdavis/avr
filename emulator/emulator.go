@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// An Emulator encapsulates the state of a processor.
 type Emulator struct {
 	Spec        *spec.MCUSpec
 	regions     []Region
@@ -25,6 +26,7 @@ type Emulator struct {
 	flags       [8]uint8
 }
 
+// NewEmulator creates and returns an initialised Emulator for the given MCUSpec.
 func NewEmulator(mcuSpec *spec.MCUSpec) (em *Emulator) {
 	em = &Emulator{
 		Spec:        mcuSpec,
@@ -41,6 +43,7 @@ func NewEmulator(mcuSpec *spec.MCUSpec) (em *Emulator) {
 	em.RegisterPortByName("SPH", SphPort{em})
 	em.RegisterPortByName("SREG", SregPort{em})
 
+	// create memory regions
 	for i, regionSpec_ := range mcuSpec.Regions {
 		switch regionSpec := regionSpec_.(type) {
 		case spec.RegsRegionSpec:

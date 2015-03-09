@@ -22,6 +22,8 @@ const (
     FlagI
 )
 
+// A reference to an I/O port. It consists of a bank number (referring to a bank
+// defined in the relevant MCUSpec) and an index within the bank.
 type PortRef struct {
     BankNum uint
     Index   uint16
