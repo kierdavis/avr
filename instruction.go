@@ -101,6 +101,7 @@ const (
     SUBI
     SWAP
     WDR
+    XCH
     
     NumInstructions
 )
@@ -204,6 +205,7 @@ var instStrings = [...]string{
     "SUBI",
     "SWAP",
     "WDR",
+    "XCH",
 }
 
 func init() {

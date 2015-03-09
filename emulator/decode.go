@@ -96,6 +96,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.ST_Z_INC
     case word&0xFE0F == 0x9202:
         return avr.ST_Z_DEC
+    case word&0xFE0F == 0x9204:
+        return avr.XCH
     case word&0xFE0F == 0x9205:
         return avr.LAS
     case word&0xFE0F == 0x9206:

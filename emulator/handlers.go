@@ -106,6 +106,7 @@ var handlers = [...]instHandler{
 	doSUBI,
 	doSWAP,
 	doWDR,
+	doXCH,
 }
 
 func init() {
@@ -1627,5 +1628,35 @@ func doSWAP(em *Emulator, word uint16) (cycles int) {
 // watchdog reset
 func doWDR(em *Emulator, word uint16) (cycles int) {
 	panic("doWDR: unimplemented")
+	return 1
+}
+
+// exchange register with memory
+// Note: may be buggy as this instruction is not fully documented in the AVR spec.
+func doXCH(em *Emulator, word uint16) (cycles int) {
+	// Rd <- [Z]
+	// [Z] <- old value of Rd
+	
+	d := (word & 0x01F0) >> 4
+
+	var addr uint16
+	
+	if em.Spec.LogDataSpaceSize > 16 {
+		// Address is RAMPZ:R31:R30
+		panic("doXCH: devices with a data space size > 16 not yet fully implemented")
+	} else if em.Spec.LogDataSpaceSize > 8 {
+		// Address is R31:R30
+		addr = (uint16(em.regs[31]) << 8) | uint16(em.regs[30])
+	} else {
+		// Address is R30
+		addr = uint16(em.regs[30])
+	}
+	
+	x := em.regs[d]
+	y := em.loadDataByte(addr)
+	
+	em.regs[d] = y
+	em.storeDataByte(addr, x)
+	
 	return 1
 }
