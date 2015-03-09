@@ -58,6 +58,7 @@ var handlers = [...]instHandler{
 	doLDD_Z,
 	doLDI,
 	doLDS,
+	doLDS_SHORT,
 }
 
 func init() {
@@ -861,7 +862,20 @@ func doLDS(em *Emulator, word uint16) (cycles int) {
 	
 	if em.Spec.LogDataSpaceSize > 16 {
 		//addr = k | (em.rampd << 16)
-		panic("doGenericLoad: devices with a data space size > 16 not yet fully implemented")
+		panic("doLDS: devices with a data space size > 16 not yet fully implemented")
+	}
+	
+	em.regs[d] = em.loadDataByte(k)
+	return 2
+}
+
+func doLDS_SHORT(em *Emulator, word uint16) (cycles int) {
+	d := 16 + ((word & 0x00F0) >> 4)
+	k := ((^word & 0x0100) >> 1) | ((word & 0x0100) >> 2) | ((word & 0x0600) >> 5) | (word & 0x000F)
+	
+	if em.Spec.LogDataSpaceSize > 16 {
+		//addr = k | (em.rampd << 16)
+		panic("doLDS_SHORT: devices with a data space size > 16 not yet fully implemented")
 	}
 	
 	em.regs[d] = em.loadDataByte(k)
