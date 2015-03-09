@@ -71,6 +71,7 @@ const (
     POP
     PUSH
     RCALL
+    RET
     
     NumInstructions
 )
@@ -144,6 +145,7 @@ var instStrings = [...]string{
     "POP",
     "PUSH",
     "RCALL",
+    "RET",
 }
 
 func init() {

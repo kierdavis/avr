@@ -110,6 +110,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.EIJMP
     case word&0xFF8F == 0x9488:
         return avr.BCLR
+    case word        == 0x9508:
+        return avr.RET
     case word        == 0x9509:
         return avr.ICALL
     case word        == 0x9519:
