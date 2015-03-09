@@ -816,42 +816,52 @@ func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *u
 	}
 }
 
+// load using pointer X
 func doLD_X(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, ' ', 26, &em.rampx)
 }
 
+// load using pointer X (post-increment)
 func doLD_X_INC(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, '+', 26, &em.rampx)
 }
 
+// load using pointer X (pre-decrement)
 func doLD_X_DEC(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, '-', 26, &em.rampx)
 }
 
+// load using pointer Y (post-increment)
 func doLD_Y_INC(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, '+', 28, &em.rampy)
 }
 
+// load using pointer Y (pre-decrement)
 func doLD_Y_DEC(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, '-', 28, &em.rampy)
 }
 
+// load using pointer Y with displacement
 func doLDD_Y(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, 'd', 28, &em.rampy)
 }
 
+// load using pointer Z (post-increment)
 func doLD_Z_INC(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, '+', 30, &em.rampz)
 }
 
+// load using pointer Z (pre-decrement)
 func doLD_Z_DEC(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, '-', 30, &em.rampz)
 }
 
+// load using pointer Z with displacement
 func doLDD_Z(em *Emulator, word uint16) (cycles int) {
 	return doGenericLoad(em, word, 'd', 30, &em.rampz)
 }
 
+// load immediate
 func doLDI(em *Emulator, word uint16) (cycles int) {
 	k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
 	d := 16 + ((word & 0x00F0) >> 4)
@@ -859,6 +869,7 @@ func doLDI(em *Emulator, word uint16) (cycles int) {
 	return 1
 }
 
+// load from literal address
 func doLDS(em *Emulator, word uint16) (cycles int) {
 	d := (word & 0x01F0) >> 4
 	k := em.fetchProgWord()
@@ -872,6 +883,7 @@ func doLDS(em *Emulator, word uint16) (cycles int) {
 	return 2
 }
 
+// load from literal address (reduced core form of LDS)
 func doLDS_SHORT(em *Emulator, word uint16) (cycles int) {
 	d := 16 + ((word & 0x00F0) >> 4)
 	k := ((^word & 0x0100) >> 1) | ((word & 0x0100) >> 2) | ((word & 0x0600) >> 5) | (word & 0x000F)

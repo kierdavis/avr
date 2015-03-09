@@ -90,7 +90,7 @@ var decodeTests = []decodeTest{
     decodeTest{word: 0x91ad, inst: avr.LD_X_INC},
     decodeTest{word: 0x905e, inst: avr.LD_X_DEC},
     decodeTest{word: 0x90fe, inst: avr.LD_X_DEC},
-    decodeTest{word: 0x80f8, inst: avr.LDD_Y}, 
+    decodeTest{word: 0x80f8, inst: avr.LDD_Y},
     decodeTest{word: 0x8128, inst: avr.LDD_Y},
     decodeTest{word: 0x9119, inst: avr.LD_Y_INC},
     decodeTest{word: 0x9089, inst: avr.LD_Y_INC},
@@ -118,6 +118,9 @@ var decodeTests = []decodeTest{
     decodeTest{word: 0x90b5, inst: avr.LPM_INC},
     decodeTest{word: 0x91f5, inst: avr.LPM_INC},
     // reducedCore also true for STS_SHORT
+    
+    // TODO: add tests for opcodes that can resolve to two different instructions
+    // depending on the status of the reducedCore flag.
 }
 
 func TestDecode(t *testing.T) {
