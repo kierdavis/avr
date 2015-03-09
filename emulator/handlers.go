@@ -515,8 +515,8 @@ func doEOR(em *Emulator, word uint16) (cycles int) {
 // unsigned fixed-point multiply
 func doFMUL(em *Emulator, word uint16) (cycles int) {
 	// extract instruction fields
-	d := (word & 0x0070) >> 4
-	r := word & 0x0007
+	d := 16 + ((word & 0x0070) >> 4)
+	r := 16 + (word & 0x0007)
 	// get operads
 	a := em.regs[d]
 	b := em.regs[r]
@@ -536,8 +536,8 @@ func doFMUL(em *Emulator, word uint16) (cycles int) {
 // signed fixed-point multiply
 func doFMULS(em *Emulator, word uint16) (cycles int) {
 	// extract instruction fields
-	d := (word & 0x0070) >> 4
-	r := word & 0x0007
+	d := 16 + ((word & 0x0070) >> 4)
+	r := 16 + (word & 0x0007)
 	// get operads
 	a := int8(em.regs[d])
 	b := int8(em.regs[r])
@@ -557,8 +557,8 @@ func doFMULS(em *Emulator, word uint16) (cycles int) {
 // fixed-point multiply with one signed operand & one unsigned operand
 func doFMULSU(em *Emulator, word uint16) (cycles int) {
 	// extract instruction fields
-	d := (word & 0x0070) >> 4
-	r := word & 0x0007
+	d := 16 + ((word & 0x0070) >> 4)
+	r := 16 + (word & 0x0007)
 	// get operads
 	a := int8(em.regs[d])
 	b := em.regs[r]
