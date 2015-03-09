@@ -70,6 +70,8 @@ var handlers = [...]instHandler{
 	doMULSU,
 	doNEG,
 	doNOP,
+	doOR,
+	doORI,
 }
 
 func init() {
@@ -1074,5 +1076,44 @@ func doNEG(em *Emulator, word uint16) (cycles int) {
 
 // no operation
 func doNOP(em *Emulator, word uint16) (cycles int) {
+	return 1
+}
+
+// bitwise OR
+func doOR(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := (word & 0x01F0) >> 4
+	r := ((word & 0x0200) >> 5) | (word & 0x000F)
+	// get operands
+	a := em.regs[d]
+	b := em.regs[r]
+	// compute result
+	x := a | b
+	// set flags
+	em.flags[avr.FlagV] = 0
+	em.flags[avr.FlagN] = (x & 0x80) >> 7
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagS] = em.flags[avr.FlagN]
+	// store result
+	em.regs[d] = x
+	return 1
+}
+
+// bitwise OR with immediate
+func doORI(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := 16 + ((word & 0x00F0) >> 4)
+	k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
+	// get operands
+	a := em.regs[d]
+	// compute result
+	x := a | k
+	// set flags
+	em.flags[avr.FlagV] = 0
+	em.flags[avr.FlagN] = (x & 0x80) >> 7
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagS] = em.flags[avr.FlagN]
+	// store result
+	em.regs[d] = x
 	return 1
 }

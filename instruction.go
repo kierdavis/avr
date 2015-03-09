@@ -65,6 +65,8 @@ const (
     MULSU
     NEG
     NOP
+    OR
+    ORI
     
     NumInstructions
 )
@@ -132,6 +134,8 @@ var instStrings = [...]string{
     "MULSU",
     "NEG",
     "NOP",
+    "OR",
+    "ORI",
 }
 
 func init() {
