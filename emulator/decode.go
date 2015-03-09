@@ -136,6 +136,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.IN
     case word&0xF800 == 0xB800:
         return avr.OUT
+    case word&0xF000 == 0xC000:
+        return avr.RJMP
     case word&0xF000 == 0xD000:
         return avr.RCALL
     case word&0xF000 == 0xE000:

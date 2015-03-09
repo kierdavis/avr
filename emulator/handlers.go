@@ -78,6 +78,7 @@ var handlers = [...]instHandler{
 	doRCALL,
 	doRET,
 	doRETI,
+	doRJMP,
 }
 
 func init() {
@@ -1191,4 +1192,16 @@ func doRETI(em *Emulator, word uint16) (cycles int) {
 	} else {
 		return 4
 	}
+}
+
+// relative jump
+func doRJMP(em *Emulator, word uint16) (cycles int) {
+	k := int32(word & 0x0FFF)
+	// sign-extend from 12 to 32 bits
+	k = (k << 20) >> 20
+	
+	// do the jump
+	em.pc += uint32(k)
+	
+	return 2
 }
