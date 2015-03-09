@@ -10,6 +10,10 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
     switch {
     case word&0xFF00 == 0x0100:
         return avr.MOVW
+    case word&0xFF00 == 0x0200:
+        return avr.MULS
+    case word&0xFF88 == 0x0300:
+        return avr.MULSU
     case word&0xFF88 == 0x0308:
         return avr.FMUL
     case word&0xFF88 == 0x0380:
@@ -108,6 +112,8 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.ADIW
     case word&0xFF00 == 0x9800:
         return avr.CBI
+    case word&0xFC00 == 0x9C00:
+        return avr.MUL
     case word&0xF800 == 0xA000 && reducedCore:
         return avr.LDS_SHORT
     case word&0xF800 == 0xB000:

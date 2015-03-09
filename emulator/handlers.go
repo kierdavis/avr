@@ -65,6 +65,9 @@ var handlers = [...]instHandler{
 	doLSR,
 	doMOV,
 	doMOVW,
+	doMUL,
+	doMULS,
+	doMULSU,
 }
 
 func init() {
@@ -988,4 +991,61 @@ func doMOVW(em *Emulator, word uint16) (cycles int) {
 	em.regs[d] = em.regs[r]
 	em.regs[d+1] = em.regs[r+1]
 	return 1
+}
+
+// unsigned multiply
+func doMUL(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := (word & 0x01F0) >> 4
+	r := ((word & 0x0200) >> 5) | (word & 0x000F)
+	// get operads
+	a := em.regs[d]
+	b := em.regs[r]
+	// compute result
+	x := uint16(a) * uint16(b)
+	// set flags
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagC] = uint8((x & 0x8000) >> 15)
+	// store result
+	em.regs[1] = uint8(x >> 8)
+	em.regs[0] = uint8(x)
+	return 2
+}
+
+// signed multiply
+func doMULS(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := 16 + ((word & 0x00F0) >> 4)
+	r := 16 + (word & 0x000F)
+	// get operads
+	a := int8(em.regs[d])
+	b := int8(em.regs[r])
+	// compute result
+	x := uint16(int16(a) * int16(b))
+	// set flags
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagC] = uint8((x & 0x8000) >> 15)
+	// store result
+	em.regs[1] = uint8(x >> 8)
+	em.regs[0] = uint8(x)
+	return 2
+}
+
+// multiply with one signed operand & one unsigned operand
+func doMULSU(em *Emulator, word uint16) (cycles int) {
+	// extract instruction fields
+	d := 16 + ((word & 0x0070) >> 4)
+	r := 16 + (word & 0x0007)
+	// get operads
+	a := int8(em.regs[d])
+	b := em.regs[r]
+	// compute result
+	x := uint16(int16(a) * int16(b))
+	// set flags
+	em.flags[avr.FlagZ] = b2i(x == 0)
+	em.flags[avr.FlagC] = uint8((x & 0x8000) >> 15)
+	// store result
+	em.regs[1] = uint8(x >> 8)
+	em.regs[0] = uint8(x)
+	return 2
 }

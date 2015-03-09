@@ -60,6 +60,9 @@ const (
     LSR
     MOV
     MOVW
+    MUL
+    MULS
+    MULSU
     
     NumInstructions
 )
@@ -123,6 +126,9 @@ func (inst Instruction) String() string {
     case LSR:       return "LSR"
     case MOV:       return "MOV"
     case MOVW:      return "MOVW"
+    case MUL:       return "MUL"
+    case MULS:      return "MULS"
+    case MULSU:     return "MULSU"
     default:        return ""
     }
 }
