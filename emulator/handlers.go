@@ -69,6 +69,7 @@ var handlers = [...]instHandler{
 	doMULS,
 	doMULSU,
 	doNEG,
+	doNOP,
 }
 
 func init() {
@@ -1068,5 +1069,10 @@ func doNEG(em *Emulator, word uint16) (cycles int) {
 	em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
 	// store result
 	em.regs[d] = x
+	return 1
+}
+
+// no operation
+func doNOP(em *Emulator, word uint16) (cycles int) {
 	return 1
 }
