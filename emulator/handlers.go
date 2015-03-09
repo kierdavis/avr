@@ -274,22 +274,26 @@ func doCALL(em *Emulator, word uint16) (cycles int) {
 	kl := em.fetchProgWord()
 	k := (uint32(kh) << 32) | uint32(kl)
 
-	cycles = 4
-	if em.Spec.Family == spec.XMEGA {
-		cycles--
-	}
-
 	if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
 		em.push(uint8(em.pc >> 16))
-		cycles++
 	}
 
 	em.push(uint8(em.pc >> 8))
 	em.push(uint8(em.pc))
 
 	em.pc = k
+	
+	if em.Spec.LogProgMemSize > 16 {
+		cycles = 5
+	} else {
+		cycles = 4
+	}
 
-	return cycles
+	if em.Spec.Family == spec.XMEGA {
+		return cycles - 1
+	} else {
+		return cycles
+	}
 }
 
 // clear bit in I/O port
@@ -596,16 +600,19 @@ func doFMULSU(em *Emulator, word uint16) (cycles int) {
 
 // indirect call
 func doICALL(em *Emulator, word uint16) (cycles int) {
-	cycles = 3
-	
 	if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
 		em.push(uint8(em.pc >> 16))
-		cycles++
 	}
 	em.push(uint8(em.pc >> 8))
 	em.push(uint8(em.pc))
 
 	em.pc = (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
+
+	if em.Spec.LogProgMemSize > 16 {
+		cycles = 4
+	} else {
+		cycles = 3
+	}
 
 	if em.Spec.Family == spec.XMEGA {
 		return cycles - 1
@@ -1156,11 +1163,8 @@ func doRCALL(em *Emulator, word uint16) (cycles int) {
 	k = (k << 20) >> 20
 	
 	// push PC
-	cycles = 3
-
 	if em.Spec.LogProgMemSize > 16 { // pc is 3 bytes
 		em.push(uint8(em.pc >> 16))
-		cycles++
 	}
 
 	em.push(uint8(em.pc >> 8))
@@ -1170,6 +1174,12 @@ func doRCALL(em *Emulator, word uint16) (cycles int) {
 	em.pc += uint32(k)
 	
 	// compute cycles
+	if em.Spec.LogProgMemSize > 16 {
+		cycles = 4
+	} else {
+		cycles = 3
+	}
+	
 	if em.Spec.Family == spec.ReducedCore {
 		return 4
 	} else if em.Spec.Family == spec.XMEGA {
