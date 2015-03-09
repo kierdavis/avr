@@ -82,6 +82,7 @@ var handlers = [...]instHandler{
 	doROR,
 	doSBC,
 	doSBCI,
+	doSBI,
 }
 
 func init() {
@@ -1271,4 +1272,19 @@ func doSBCI(em *Emulator, word uint16) (cycles int) {
 	em.flags[avr.FlagC] = (c & 0x80) >> 7
 	em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
 	return 1
+}
+
+// set bit in I/O port
+func doSBI(em *Emulator, word uint16) (cycles int) {
+	a := (word & 0x00F8) >> 3
+	b := word & 0x0007
+
+	x := em.readPort(0, a)
+	x = x | (1 << b)
+	em.writePort(0, a, x)
+
+	if em.Spec.Family == spec.XMEGA || em.Spec.Family == spec.ReducedCore {
+		return 1
+	}
+	return 2
 }
