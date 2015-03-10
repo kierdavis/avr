@@ -91,9 +91,11 @@ const (
     ST_X
     ST_X_INC
     ST_X_DEC
+    ST_Y
     ST_Y_INC
     ST_Y_DEC
     STD_Y
+    ST_Z
     ST_Z_INC
     ST_Z_DEC
     STD_Z
@@ -197,9 +199,11 @@ var instStrings = [...]string{
     "ST_X",
     "ST_X_INC",
     "ST_X_DEC",
+    "ST_Y",
     "ST_Y_INC",
     "ST_Y_DEC",
     "STD_Y",
+    "ST_Z",
     "ST_Z_INC",
     "ST_Z_DEC",
     "STD_Z",

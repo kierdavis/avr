@@ -96,9 +96,11 @@ var handlers = [...]instHandler{
     doST_X,
     doST_X_INC,
     doST_X_DEC,
+    doST_Y,
     doST_Y_INC,
     doST_Y_DEC,
     doSTD_Y,
+    doST_Z,
     doST_Z_INC,
     doST_Z_DEC,
     doSTD_Z,
@@ -1524,6 +1526,11 @@ func doST_X_DEC(em *Emulator, word uint16) (cycles int) {
     return doGenericStore(em, word, '-', 26, &em.rampx)
 }
 
+// store using pointer Y
+func doST_Y(em *Emulator, word uint16) (cycles int) {
+    return doGenericStore(em, word, ' ', 28, &em.rampy)
+}
+
 // store using pointer Y (post-increment)
 func doST_Y_INC(em *Emulator, word uint16) (cycles int) {
     return doGenericStore(em, word, '+', 28, &em.rampy)
@@ -1539,19 +1546,24 @@ func doSTD_Y(em *Emulator, word uint16) (cycles int) {
     return doGenericStore(em, word, 'd', 28, &em.rampy)
 }
 
+// store using pointer Z
+func doST_Z(em *Emulator, word uint16) (cycles int) {
+    return doGenericStore(em, word, ' ', 30, &em.rampz)
+}
+
 // store using pointer Z (post-increment)
 func doST_Z_INC(em *Emulator, word uint16) (cycles int) {
-    return doGenericStore(em, word, '+', 30, &em.rampy)
+    return doGenericStore(em, word, '+', 30, &em.rampz)
 }
 
 // store using pointer Z (pre-decrement)
 func doST_Z_DEC(em *Emulator, word uint16) (cycles int) {
-    return doGenericStore(em, word, '-', 30, &em.rampy)
+    return doGenericStore(em, word, '-', 30, &em.rampz)
 }
 
 // store using pointer Z with displacement
 func doSTD_Z(em *Emulator, word uint16) (cycles int) {
-    return doGenericStore(em, word, 'd', 30, &em.rampy)
+    return doGenericStore(em, word, 'd', 30, &em.rampz)
 }
 
 // store to literal address
