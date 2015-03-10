@@ -201,6 +201,7 @@ func (em *Emulator) writePort(bankNum uint, index uint16, val uint8) {
     port, ok := em.ports[avr.PortRef{bankNum, index}]
     if !ok {
         em.warn(UnmappedPortWarning{em.pc - 1, bankNum, index})
+        return
     }
 
     port.Write(val)
