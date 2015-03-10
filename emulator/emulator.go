@@ -111,6 +111,16 @@ func (em *Emulator) Run(cycles int) {
     }
 }
 
+// Copy program words from buf into program memory starting at the given address.
+// The method panics if the address is out of range at any point (the size of the
+// program memory is equal to 1 << em.Spec.LogProgMemSize).
+func (em *Emulator) WriteProg(address uint16, buf []uint16) {
+    for _, word := range buf {
+        em.prog[address] = word
+        address++
+    }
+}
+
 func (em *Emulator) fetchProgWord() (word uint16) {
     word = em.prog[em.pc]
     em.pc = (em.pc + 1) & ((1 << em.Spec.LogProgMemSize) - 1)
