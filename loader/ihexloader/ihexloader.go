@@ -23,7 +23,7 @@ func Load(em *emulator.Emulator, r io.Reader) (err error) {
                 buf = append(buf, (hi << 8) | lo)
             }
             
-            em.WriteProg(rec.Address, buf)
+            em.WriteProg(rec.Address >> 1, buf)
         }
     }
     
