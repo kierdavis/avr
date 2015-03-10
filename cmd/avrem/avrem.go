@@ -22,6 +22,7 @@ func main() {
 
 func runEmulator() {
     em := emulator.NewEmulator(spec.ATmega168)
+    em.LogWarnings(true)
     loadProgram(em)
     
     em.Run(1000)
