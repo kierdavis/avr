@@ -45,9 +45,11 @@ const (
     LD_X
     LD_X_INC
     LD_X_DEC
+    LD_Y
     LD_Y_INC
     LD_Y_DEC
     LDD_Y
+    LD_Z
     LD_Z_INC
     LD_Z_DEC
     LDD_Z
@@ -149,9 +151,11 @@ var instStrings = [...]string{
     "LD_X",
     "LD_X_INC",
     "LD_X_DEC",
+    "LD_Y",
     "LD_Y_INC",
     "LD_Y_DEC",
     "LDD_Y",
+    "LD_Z",
     "LD_Z_INC",
     "LD_Z_DEC",
     "LDD_Z",

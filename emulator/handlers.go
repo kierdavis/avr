@@ -50,9 +50,11 @@ var handlers = [...]instHandler{
     doLD_X,
     doLD_X_INC,
     doLD_X_DEC,
+    doLD_Y,
     doLD_Y_INC,
     doLD_Y_DEC,
     doLDD_Y,
+    doLD_Z,
     doLD_Z_INC,
     doLD_Z_DEC,
     doLDD_Z,
@@ -866,6 +868,11 @@ func doLD_X_DEC(em *Emulator, word uint16) (cycles int) {
     return doGenericLoad(em, word, '-', 26, &em.rampx)
 }
 
+// load using pointer Y
+func doLD_Y(em *Emulator, word uint16) (cycles int) {
+    return doGenericLoad(em, word, ' ', 28, &em.rampy)
+}
+
 // load using pointer Y (post-increment)
 func doLD_Y_INC(em *Emulator, word uint16) (cycles int) {
     return doGenericLoad(em, word, '+', 28, &em.rampy)
@@ -879,6 +886,11 @@ func doLD_Y_DEC(em *Emulator, word uint16) (cycles int) {
 // load using pointer Y with displacement
 func doLDD_Y(em *Emulator, word uint16) (cycles int) {
     return doGenericLoad(em, word, 'd', 28, &em.rampy)
+}
+
+// load using pointer Z
+func doLD_Z(em *Emulator, word uint16) (cycles int) {
+    return doGenericLoad(em, word, ' ', 30, &em.rampz)
 }
 
 // load using pointer Z (post-increment)

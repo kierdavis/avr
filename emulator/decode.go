@@ -4,8 +4,12 @@ import (
     "github.com/kierdavis/avr"
 )
 
-// On reduced core AVRs, the LDD and STD instructions are not present, and their
-// bit patterns are used for alternate forms of LDS and STS.
+// Non-reduced core AVRs:
+//   Normal (2-word) LDS/STS
+//   LDD/STD with any displacement
+// Reduced core AVRs:
+//   Short (1-word) LDS/STS - overlaps with LDD/STD
+//   LD/ST equivalent to LDD/STD with zero displacement
 func Decode(word uint16, reducedCore bool) avr.Instruction {
     switch {
     case word        == 0x0000:
@@ -54,8 +58,12 @@ func Decode(word uint16, reducedCore bool) avr.Instruction {
         return avr.ORI
     case word&0xF000 == 0x7000:
         return avr.ANDI
+    case word&0xFE0F == 0x8000 && reducedCore:
+        return avr.LD_Z
     case word&0xD208 == 0x8000 && !reducedCore:
         return avr.LDD_Z
+    case word&0xFE0F == 0x8008 && reducedCore:
+        return avr.LD_Y
     case word&0xD208 == 0x8008 && !reducedCore:
         return avr.LDD_Y
     case word&0xD208 == 0x8200 && !reducedCore:
