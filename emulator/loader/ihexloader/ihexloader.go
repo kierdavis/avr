@@ -7,9 +7,9 @@ import (
     "io"
 )
 
-// LoadIHEX parses an IHEX file from r and loads the program data contained in
+// Load parses an IHEX file from r and loads the program data contained in
 // it into em.
-func LoadIHEX(em *emulator.Emulator, r io.Reader) (err error) {
+func Load(em *emulator.Emulator, r io.Reader) (err error) {
     dec := ihex.NewDecoder(r)
     buf := make([]uint16, 0, 8)
     
