@@ -5,8 +5,6 @@ import (
     "github.com/kierdavis/avr"
 )
 
-// TODO: tiny4/5/9/10 should only support LDD with zero displacement (i.e. LD Rd, Y)
-
 func tiny4_5_9_10(v int) *MCUSpec {
     ports := map[string]avr.PortRef{
         "PINB":   avr.PortRef{0, 0x00},

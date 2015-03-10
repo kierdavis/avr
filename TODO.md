@@ -3,13 +3,11 @@ To-do list
 
 ## Short term
 
-* Finalise `ATmega48/88/168` and `ATtiny4/5/9/10` specs by adding a `Supports`
-  field.
+* Write an Intel Hex format parsing package.
+* Write an emulator frontend (does not need to do any I/O yet).
 
 ## Long term
 
-* Write an Intel Hex format parsing package.
-* Write an emulator frontend (does not need to do any I/O yet).
 * Manually test basic functionality of all instructions.
 * Begin adding I/O packages to the `io` subdirectory. I/O packages should be
   enabled/disabled in the frontend with command-line flags.
@@ -18,7 +16,8 @@ To-do list
       Ethernet controller
     * Pins, as a middleware that can be used to connect other devices e.g.
       simple LEDs & switches
-* Optimise, optimise, optimise
+* Optimise, optimise, optimise.
+* Take into account 16-register processors (since the 16 registers that are provided are actually regs 16-31).
 
 ## Thoughts
 
