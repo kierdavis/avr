@@ -3,15 +3,13 @@ To-do list
 
 ## Short term
 
-* Write an Intel Hex format parsing package.
-* Write an emulator frontend (does not need to do any I/O yet).
+* Implement UART I/O package.
 
 ## Long term
 
 * Manually test basic functionality of all instructions.
 * Begin adding I/O packages to the `io` subdirectory. I/O packages should be
   enabled/disabled in the frontend with command-line flags.
-    * UART (command-line interface)
     * SPI, as a middleware that can be used to connect other devices e.g.
       Ethernet controller
     * Pins, as a middleware that can be used to connect other devices e.g.
