@@ -98,10 +98,13 @@ func linkRegions(s *MCUSpec) *MCUSpec {
         switch r_ := r.(type) {
         case RegsRegionSpec:
             r_.mcuSpec = s
+            r = r_
         case IORegionSpec:
             r_.mcuSpec = s
+            r = r_
         case RAMRegionSpec:
             r_.mcuSpec = s
+            r = r_
         }
         s.Regions[i] = r
     }
