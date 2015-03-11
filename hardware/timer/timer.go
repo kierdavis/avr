@@ -121,15 +121,23 @@ func (t *Timer) Tick() {
     
     // Trigger interrupts, if possible
     if t.em != nil && t.em.InterruptsEnabled() {
+        intName := ""
         if t.interruptFlags & 0x01 != 0 && t.interruptMask & 0x01 != 0 {
             t.interruptFlags &= 0xFE // clear flag
-            t.em.InterruptByName(fmt.Sprintf("TIMER%d_OVF", t.digit))
+            intName = fmt.Sprintf("TIMER%d_OVF", t.digit)
         } else if t.interruptFlags & 0x02 != 0 && t.interruptMask & 0x02 != 0 {
             t.interruptFlags &= 0xFD // clear flag
-            t.em.InterruptByName(fmt.Sprintf("TIMER%d_COMPA", t.digit))
+            intName = fmt.Sprintf("TIMER%d_COMPA", t.digit)
         } else if t.interruptFlags & 0x04 != 0 && t.interruptMask & 0x04 != 0 {
             t.interruptFlags &= 0xFB // clear flag
-            t.em.InterruptByName(fmt.Sprintf("TIMER%d_COMPB", t.digit))
+            intName = fmt.Sprintf("TIMER%d_COMPB", t.digit)
+        }
+        
+        if intName != "" {
+            ok := t.em.InterruptByName(intName)
+            if !ok && t.logging {
+                log.Printf("[avr/hardware/timer:(*Timer).Tick] failed to trigger interrupt %s", intName)
+            }
         }
     }
     
