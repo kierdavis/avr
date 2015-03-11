@@ -145,11 +145,11 @@ func (t *Timer) checkOCPinNormalMode(ocPinNum uint, compareVal uint8) {
 // Tick the timer in phase-corrected PWM mode.
 func (t *Timer) tickPCPWMMode(top uint8) {
     if t.downwards {
-        if t.count - 1 == 0x00 { // Reached BOTTOM
+        if t.count == 0x00 { // Reached BOTTOM
             t.downwards = false // Begin counting upwards
         }
     } else {
-        if t.count + 1 == top { // Reached TOP
+        if t.count == top { // Reached TOP
             t.downwards = true // Begin counting downwards
         }
     }
