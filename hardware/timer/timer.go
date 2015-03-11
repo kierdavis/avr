@@ -290,7 +290,7 @@ func (p tccra) Read() uint8 {
 
 func (p tccra) Write(x uint8) {
     if p.t.logging {
-        log.Printf("[avr/hardware/timer:tccrb.Write] $%02X (%08b) written to TCCRxA", x, x)
+        log.Printf("[avr/hardware/timer:tccra.Write] $%02X (%08b) written to TCCRxA", x, x)
     }
     p.t.controlA = x
 }
