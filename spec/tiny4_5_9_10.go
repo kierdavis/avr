@@ -49,6 +49,20 @@ func tiny4_5_9_10(v int) *MCUSpec {
         "SREG":   avr.PortRef{0, 0x3F},
     }
     
+    interrupts := map[string]uint{
+        "RESET":      0,
+        "INT0":       1,
+        "PCINT0":     2,
+        "TIM0_CAPT":  3,
+        "TIM0_OVF":   4,
+        "TIM0_COMPA": 5,
+        "TIM0_COMPB": 6,
+        "ANA_COMP":   7,
+        "WDT":        8,
+        "VLM":        9,
+        // ADC: 10
+    }
+    
     // ADC
     if v == 5 || v == 10 {
         ports["DIDR0"] = avr.PortRef{0, 0x17}
@@ -56,6 +70,7 @@ func tiny4_5_9_10(v int) *MCUSpec {
         ports["ADMUX"] = avr.PortRef{0, 0x1B}
         ports["ADCSRA"] = avr.PortRef{0, 0x1C}
         ports["ADCSRB"] = avr.PortRef{0, 0x1D}
+        interrupts["ADC"] = 10
     }
 
     var logProgMemSize uint
@@ -74,12 +89,14 @@ func tiny4_5_9_10(v int) *MCUSpec {
         LogDataSpaceSize: 7, // data memory address width
         LogRAMSize:       5, // 32 B
         LogEEPROMSize:    0, // none
+        InterruptVectorSize: 1,
         IOBankSizes:      []uint{64},
         Regions: []RegionSpec{
             IORegionSpec{start: 0x0000, bankNum: 0},
             RAMRegionSpec{start: 0x0040},
         },
         Ports: ports,
+        Interrupts: interrupts,
         Available: [avr.NumInstructions]bool{
             /* ADC */       true,
             /* ADD */       true,

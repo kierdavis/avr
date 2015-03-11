@@ -28,9 +28,11 @@ type MCUSpec struct {
     LogDataSpaceSize uint
     LogRAMSize       uint
     LogEEPROMSize    uint
+    InterruptVectorSize uint // size of a single interrupt vector, in words
     IOBankSizes      []uint
     Regions          []RegionSpec
     Ports            map[string]avr.PortRef
+    Interrupts       map[string]uint
     Available        [avr.NumInstructions]bool
 }
 

@@ -94,29 +94,61 @@ func mega48_88_168(v int) *MCUSpec {
         "UBRR0H": avr.PortRef{1, 0x65},
         "UDR0":   avr.PortRef{1, 0x66},
     }
+    
+    interrupts := map[string]uint{
+        "RESET":        0,
+        "INT0":         1,
+        "INT1":         2,
+        "PCINT0":       3,
+        "PCINT1":       4,
+        "PCINT2":       5,
+        "WDT":          6,
+        "TIMER2_COMPA": 7,
+        "TIMER2_COMPB": 8,
+        "TIMER2_OVF":   9,
+        "TIMER1_CAPT":  10,
+        "TIMER1_COMPA": 11,
+        "TIMER1_COMPB": 12,
+        "TIMER1_OVF":   13,
+        "TIMER0_COMPA": 14,
+        "TIMER0_COMPB": 15,
+        "TIMER0_OVF":   16,
+        "SPI_STC":      17,
+        "USART_RX":     18,
+        "USART_UDRE":   19,
+        "USART_TX":     20,
+        "ADC":          21,
+        "EE_READY":     22,
+        "ANALOG_COMP":  23,
+        "TWI":          24,
+        "SPM_READY":    25,
+    }
 
     // GTCCR port only present on ATmega88/168
     if v != 48 {
         ports["GTCCR"] = avr.PortRef{0, 0x23}
     }
 
-    var logProgMemSize, logDataSpaceSize, logRAMSize, logEEPROMSize uint
+    var logProgMemSize, logDataSpaceSize, logRAMSize, logEEPROMSize, interruptVectorSize uint
     switch v {
     case 48:
         logProgMemSize = 11 // 2 kW (4 kB)
         logDataSpaceSize = 10
         logRAMSize = 9      // 512 B
         logEEPROMSize = 8   // 256 B
+        interruptVectorSize = 1
     case 88:
         logProgMemSize = 12 // 4 kW (8 kB)
         logDataSpaceSize = 11
         logRAMSize = 10     // 1 kB
         logEEPROMSize = 9   // 512 B
+        interruptVectorSize = 1
     case 168:
         logProgMemSize = 13 // 8 kW (16 kB)
         logDataSpaceSize = 11
         logRAMSize = 10     // 1 kB
         logEEPROMSize = 9   // 512 B
+        interruptVectorSize = 2
     }
 
     return linkRegions(&MCUSpec{
@@ -127,6 +159,7 @@ func mega48_88_168(v int) *MCUSpec {
         LogDataSpaceSize: logDataSpaceSize, // data memory address width
         LogRAMSize:       logRAMSize,
         LogEEPROMSize:    logEEPROMSize,
+        InterruptVectorSize: interruptVectorSize,
         IOBankSizes:      []uint{64, 160},
         Regions: []RegionSpec{
             RegsRegionSpec{start: 0x0000},
@@ -135,6 +168,7 @@ func mega48_88_168(v int) *MCUSpec {
             RAMRegionSpec{start: 0x0100},
         },
         Ports: ports,
+        Interrupts: interrupts,
         Available: [avr.NumInstructions]bool{
             /* ADC */       true,
             /* ADD */       true,
