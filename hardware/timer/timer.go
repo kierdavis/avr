@@ -119,6 +119,20 @@ func (t *Timer) Tick() {
         t.count++
     }
     
+    // Trigger interrupts, if possible
+    if t.em != nil && t.em.InterruptsEnabled() {
+        if t.interruptFlags & 0x01 != 0 && t.interruptMask & 0x01 != 0 {
+            t.interruptFlags &= 0xFE // clear flag
+            t.em.InterruptByName(fmt.Sprintf("TIMER%d_OVF", t.digit))
+        } else if t.interruptFlags & 0x02 != 0 && t.interruptMask & 0x02 != 0 {
+            t.interruptFlags &= 0xFD // clear flag
+            t.em.InterruptByName(fmt.Sprintf("TIMER%d_COMPA", t.digit))
+        } else if t.interruptFlags & 0x04 != 0 && t.interruptMask & 0x04 != 0 {
+            t.interruptFlags &= 0xFB // clear flag
+            t.em.InterruptByName(fmt.Sprintf("TIMER%d_COMPB", t.digit))
+        }
+    }
+    
     /*
     if t.logging {
         log.Printf("[avr/hardware/timer:(*Timer).tick] ticked, count is now $%02X", t.count)
@@ -305,26 +319,14 @@ func (t *Timer) updateOCPin(ocPinNum uint) {
 func (t *Timer) setOCF(ocPinNum uint) {
     if ocPinNum == 0 { // A
         t.interruptFlags |= 0x02 // set flag
-        if t.interruptMask & 0x02 != 0 && t.em != nil { // If interrupt enabled
-            t.interruptFlags &= 0xFD // re-clear flag
-            t.em.InterruptByName(fmt.Sprintf("TIMER%d_COMPA", t.digit))
-        }
     } else { // B
         t.interruptFlags |= 0x04 // set flag
-        if t.interruptMask & 0x04 != 0 && t.em != nil { // If interrupt enabled
-            t.interruptFlags &= 0xFB // re-clear flag
-            t.em.InterruptByName(fmt.Sprintf("TIMER%d_COMPB", t.digit))
-        }
     }
 }
 
 // Set the timer overflow (TOV) flag.
 func (t *Timer) setTOV() {
     t.interruptFlags |= 0x01 // set flag
-    if t.interruptMask & 0x01 != 0 && t.em != nil { // If interrupt enabled
-        t.interruptFlags &= 0xFE // re-clear flag
-        t.em.InterruptByName(fmt.Sprintf("TIMER%d_OVF", t.digit))
-    }
 }
 
 // Implementation of TCCRxA port

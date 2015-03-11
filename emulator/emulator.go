@@ -87,6 +87,10 @@ func (em *Emulator) UnregisterPortByName(name string) (ok bool) {
     return true
 }
 
+func (em *Emulator) InterruptsEnabled() bool {
+    return em.Flags[avr.FlagI] != 0
+}
+
 func (em *Emulator) Interrupt(num uint) {
     panic("unimplemented")
 }
