@@ -19,7 +19,11 @@ import (
 
 // TODO: thread-safety!!
 
+// TODO: OCFy/TOV flags should not be cleared upon interrupt execution if the
+// emulator's global interrupt enable flag is cleared
+
 type Timer struct {
+    em *emulator.Emulator
     digit uint
     controlA uint8
     controlB uint8
@@ -45,6 +49,8 @@ func (t *Timer) SetLogging(enabled bool) {
 }
 
 func (t *Timer) AddTo(em *emulator.Emulator) {
+    t.em = em
+    
     em.RegisterPortByName(fmt.Sprintf("TCCR%dA", t.digit), tccra{t})
     em.RegisterPortByName(fmt.Sprintf("TCCR%dB", t.digit), tccrb{t})
     em.RegisterPortByName(fmt.Sprintf("TCNT%d", t.digit), tcnt{t})
@@ -82,6 +88,14 @@ func (t *Timer) Tick() {
     wgmB := (t.controlB & 0x08) >> 1 // bit 3 (shifted to bit 2)
     wgm := wgmB | wgmA
     
+    // Handle match-compare interrupts
+    if t.count == t.compareValA {
+        t.setOCF(0)
+    }
+    if t.count == t.compareValB {
+        t.setOCF(1)
+    }
+    
     // Prepare to tick counter
     switch wgm {
     case 0: // Normal
@@ -116,7 +130,7 @@ func (t *Timer) Tick() {
 func (t *Timer) tickNormalMode() {
     t.downwards = false
     if t.count == 0xFF { // Overflow
-        t.interruptFlags |= 0x01 // set TOVx bit
+        t.setTOV()
     }
     
     t.checkOCPinNormalMode(0, t.compareValA)
@@ -147,6 +161,7 @@ func (t *Timer) tickPCPWMMode(top uint8) {
     if t.downwards {
         if t.count == 0x00 { // Reached BOTTOM
             t.downwards = false // Begin counting upwards
+            t.setTOV()
         }
     } else {
         if t.count == top { // Reached TOP
@@ -192,6 +207,11 @@ func (t *Timer) checkOCPinPCPWMMode(ocPinNum uint, compareVal uint8) {
 // Tick the timer in clear-timer-on-compare mode.
 func (t *Timer) tickCTCMode() {
     t.downwards = false
+    
+    if t.count == 0xFF { // Overflow
+        t.setTOV()
+    }
+    
     if t.count == t.compareValA {
         // this tick should set counter to 0
         t.count = 0xFF
@@ -201,9 +221,11 @@ func (t *Timer) tickCTCMode() {
 // Tick the timer in fast PWM mode.
 func (t *Timer) tickFastPWMMode(top uint8) {
     t.downwards = false
+    
     if t.count == top {
         // this tick should set counter to 0
         t.count = 0xFF
+        t.setTOV()
     }
     
     t.checkOCPinFastPWMMode(0, t.compareValA)
@@ -276,6 +298,32 @@ func (t *Timer) updateOCPin(ocPinNum uint) {
     callback := t.ocPinCallbacks[ocPinNum]
     if callback != nil {
         callback(t.ocPinStates[ocPinNum])
+    }
+}
+
+// Set an output compare match (OCFy) flag.
+func (t *Timer) setOCF(ocPinNum uint) {
+    if ocPinNum == 0 { // A
+        t.interruptFlags |= 0x02 // set flag
+        if t.interruptMask & 0x02 != 0 && t.em != nil { // If interrupt enabled
+            t.interruptFlags &= 0xFD // re-clear flag
+            t.em.InterruptByName(fmt.Sprintf("TIMER%d_COMPA", t.digit))
+        }
+    } else { // B
+        t.interruptFlags |= 0x04 // set flag
+        if t.interruptMask & 0x04 != 0 && t.em != nil { // If interrupt enabled
+            t.interruptFlags &= 0xFB // re-clear flag
+            t.em.InterruptByName(fmt.Sprintf("TIMER%d_COMPB", t.digit))
+        }
+    }
+}
+
+// Set the timer overflow (TOV) flag.
+func (t *Timer) setTOV() {
+    t.interruptFlags |= 0x01 // set flag
+    if t.interruptMask & 0x01 != 0 && t.em != nil { // If interrupt enabled
+        t.interruptFlags &= 0xFE // re-clear flag
+        t.em.InterruptByName(fmt.Sprintf("TIMER%d_OVF", t.digit))
     }
 }
 
@@ -373,5 +421,6 @@ func (p tifr) Read() uint8 {
 }
 
 func (p tifr) Write(x uint8) {
-    p.t.interruptFlags = x
+    // Bits in TIFRx are cleared by writing a one to them.
+    p.t.interruptFlags &= ^x
 }

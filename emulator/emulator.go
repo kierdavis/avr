@@ -87,6 +87,14 @@ func (em *Emulator) UnregisterPortByName(name string) (ok bool) {
     return true
 }
 
+func (em *Emulator) Interrupt(num uint) {
+    panic("unimplemented")
+}
+
+func (em *Emulator) InterruptByName(name string) {
+    panic("unimplemented")
+}
+
 func (em *Emulator) Run(clk clock.Clock) {
     reducedCore := em.Spec.Family == spec.ReducedCore
     
