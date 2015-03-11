@@ -6,6 +6,7 @@ import (
     "github.com/kierdavis/avr/clock"
     "github.com/kierdavis/avr/emulator"
     "github.com/kierdavis/avr/hardware/gpio"
+    "github.com/kierdavis/avr/hardware/timer"
     "github.com/kierdavis/avr/loader/ihexloader"
     "github.com/kierdavis/avr/spec"
     "os"
@@ -52,9 +53,12 @@ func loadProgram(em *emulator.Emulator) {
 }
 
 func setupIO(em *emulator.Emulator) {
-    gpio := gpio.New('B', 8)
-    gpio.SetOutputAdapter(5, &PrintingOutputPinAdapter{Label: "LED"})
-    gpio.AddTo(em)
+    gpioB := gpio.New('B', 8)
+    gpioB.SetOutputAdapter(5, &PrintingOutputPinAdapter{Label: "LED"})
+    gpioB.AddTo(em)
+    
+    t0 := timer.New(0)
+    t0.AddTo(em)
 }
 
 type PrintingOutputPinAdapter struct {
