@@ -61,27 +61,13 @@ func (t *Timer) OverrideOCPin(ocPinNum uint, gpioPinNum uint, g *gpio.GPIO) {
 }
 
 // Run the timer off the specified clock.
-func (t *Timer) Run(clk *clock.Slave) {
+func (t *Timer) Run(clk clock.Clock) {
+    // TODO: implement clock source selector again
+    
     for {
-        switch t.controlB & 0x07 {
-        case 0: // No clock source (timer stopped)
-            clk.Wait()
-            continue // try again
-        
-        // System clock with prescaler
-        case 1: clk.Wait()
-        case 2: clk.WaitN(8)
-        case 3: clk.WaitN(64)
-        case 4: clk.WaitN(256)
-        case 5: clk.WaitN(1024)
-        
-        case 6: // T0 pin, falling edge
-            panic("(*Timer).Run: external clock sources not implemented")
-        case 7: // T0 pin, rising edge
-            panic("(*Timer).Run: external clock sources not implemented")
-        }
-        
+        now := clk.Now()
         t.Tick()
+        clk.Await(now + 1)
     }
 }
 

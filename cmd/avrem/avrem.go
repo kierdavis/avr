@@ -10,6 +10,7 @@ import (
     "github.com/kierdavis/avr/loader/ihexloader"
     "github.com/kierdavis/avr/spec"
     "os"
+    "time"
 )
 
 func main() {
@@ -28,14 +29,20 @@ func runEmulator() {
     
     em := emulator.NewEmulator(spec.ATmega168)
     em.SetLogging(true)
+    
     loadProgram(em)
     setupIO(em, clk)
     
-    go em.Run(clk.Spawn(1))
+    go em.Run(clk)
     
-    for i := 0; i < 1e8; i++ {
-        clk.Tick(10)
-    }
+    stopSig := clock.NewSignal()
+    go func() {
+        time.Sleep(time.Second * 5)
+        stopSig.Trigger()
+    }()
+    
+    freq := 1e6 // 1 MHz
+    clk.Run(time.Second / time.Duration(freq), stopSig)
     
     fmt.Println("OK.")
 }
@@ -55,7 +62,7 @@ func loadProgram(em *emulator.Emulator) {
     }
 }
 
-func setupIO(em *emulator.Emulator, clk *clock.Master) {
+func setupIO(em *emulator.Emulator, clk clock.Clock) {
     gpioB := gpio.New('B', 8)
     gpioB.SetOutputAdapter(5, &PrintingOutputPinAdapter{Label: "LED"})
     gpioB.AddTo(em)
@@ -63,7 +70,7 @@ func setupIO(em *emulator.Emulator, clk *clock.Master) {
     t0 := timer.New(0)
     t0.SetLogging(true)
     t0.AddTo(em)
-    go t0.Run(clk.Spawn(1))
+    go t0.Run(clk)
 }
 
 type PrintingOutputPinAdapter struct {

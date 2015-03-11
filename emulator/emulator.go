@@ -87,29 +87,30 @@ func (em *Emulator) UnregisterPortByName(name string) (ok bool) {
     return true
 }
 
-func (em *Emulator) Run(clk *clock.Slave) {
+func (em *Emulator) Run(clk clock.Clock) {
     reducedCore := em.Spec.Family == spec.ReducedCore
     
     for {
+        now := clk.Now()
+        
         word := em.fetchProgWord()
         inst := Decode(word, reducedCore)
         if inst < 0 {
             em.warn(InvalidInstructionWarning{em.pc - 1, word})
-            clk.Wait()
+            clk.Await(now + 1)
             continue
         }
         
         if !em.Spec.Available[inst] {
             em.warn(UnavailableInstructionWarning{em.pc - 1, inst, em.Spec})
-            clk.Wait()
+            clk.Await(now + 1)
             continue
         }
 
         handler := handlers[inst]
         cycles := handler(em, word)
-        for i := 0; i < cycles; i++ {
-            clk.Wait()
-        }
+        
+        clk.Await(now + uint64(cycles))
     }
 }
 
