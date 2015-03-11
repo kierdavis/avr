@@ -3,7 +3,8 @@ To-do list
 
 ## Short term
 
-* Implement UART I/O package.
+* Implement timer/count hardware package.
+* Implement UART hardware package.
 
 ## Long term
 
@@ -15,6 +16,7 @@ To-do list
     * Pins, as a middleware that can be used to connect other devices e.g.
       simple LEDs & switches
 * Optimise, optimise, optimise.
+* Remove dependency of timer, UART etc. on GPIO by creating a physical pin multiplexer module.
 * Take into account 16-register processors (since the 16 registers that are provided are actually regs 16-31).
 
 ## Thoughts
