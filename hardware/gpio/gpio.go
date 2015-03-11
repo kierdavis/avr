@@ -1,6 +1,8 @@
 // Package gpio implements a general purpose digital I/O port.
-// Works with:
+// Tested compatibility:
 //   ATmega48/88/168
+// Untested compatibility:
+//   ATtiny4/5/9/10
 package gpio
 
 import (
