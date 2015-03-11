@@ -1,11 +1,10 @@
 package emulator
 
 import (
-    "fmt"
     "github.com/kierdavis/avr"
     "github.com/kierdavis/avr/clock"
     "github.com/kierdavis/avr/spec"
-    "os"
+    "log"
 )
 
 // An Emulator encapsulates the state of a processor.
@@ -22,9 +21,9 @@ type Emulator struct {
     rampz       uint8
     rampd       uint8
     eind        uint8
-    logWarnings bool
     regs        [32]uint8
     flags       [8]uint8
+    logging     bool
 }
 
 // NewEmulator creates and returns an initialised Emulator for the given MCUSpec.
@@ -36,7 +35,6 @@ func NewEmulator(mcuSpec *spec.MCUSpec) (em *Emulator) {
         prog:        make([]uint16, 1<<mcuSpec.LogProgMemSize),
         ram:         make([]uint8, 1<<mcuSpec.LogRAMSize),
         pc:          0,
-        logWarnings: false,
     }
 
     // register standard ports
@@ -59,8 +57,8 @@ func NewEmulator(mcuSpec *spec.MCUSpec) (em *Emulator) {
     return em
 }
 
-func (em *Emulator) LogWarnings(enabled bool) {
-    em.logWarnings = enabled
+func (em *Emulator) SetLogging(enabled bool) {
+    em.logging = enabled
 }
 
 func (em *Emulator) RegisterPort(pref avr.PortRef, port Port) {
@@ -229,7 +227,7 @@ func (em *Emulator) skip() (cycles int) {
 // * accesses to an unmapped data memory address
 // which are ignored by a real MCU but are often indicative of software errors.
 func (em *Emulator) warn(w Warning) {
-    if em.logWarnings {
-        fmt.Fprintf(os.Stderr, "avr: emulation warning: %s\n", w.String())
+    if em.logging {
+        log.Printf("[avr/emulator:(*Emulator).warn] %s\n", w.String())
     }
 }

@@ -27,7 +27,7 @@ func runEmulator() {
     clk := clock.New()
     
     em := emulator.NewEmulator(spec.ATmega168)
-    em.LogWarnings(true)
+    em.SetLogging(true)
     loadProgram(em)
     setupIO(em, clk)
     
