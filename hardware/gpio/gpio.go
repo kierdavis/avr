@@ -26,6 +26,7 @@ type GPIO struct {
     pullups uint8
     inputAdapters [8]InputPinAdapter
     outputAdapters [8]OutputPinAdapter
+    overriden [8]bool
 }
 
 func New(portLetter byte, width uint) (g *GPIO) {
@@ -41,6 +42,18 @@ func (g *GPIO) SetInputAdapter(pinNumber uint, adapter InputPinAdapter) {
 
 func (g *GPIO) SetOutputAdapter(pinNumber uint, adapter OutputPinAdapter) {
     g.outputAdapters[pinNumber] = adapter
+}
+
+// Prevent an output pin from being changed by writes to PORT, and return a
+// callback that, when called, updates the state of the output pin.
+func (g *GPIO) OverrideOutput(pinNumber uint) (callback func(bool)) {
+    g.overriden[pinNumber] = true
+    return func(newState bool) {
+        adapter := g.outputAdapters[pinNumber]
+        if adapter != nil {
+            adapter.SetState(newState)
+        }
+    }
 }
 
 func (g *GPIO) AddTo(em *emulator.Emulator) {
@@ -92,9 +105,11 @@ func (g *GPIO) updateOutput(pinNumber uint) {
             }
         
         } else {
-            adapter := g.outputAdapters[pinNumber]
-            if adapter != nil {
-                adapter.SetState((g.outputs >> pinNumber) & 1 != 0)
+            if !g.overriden[pinNumber] {
+                adapter := g.outputAdapters[pinNumber]
+                if adapter != nil {
+                    adapter.SetState((g.outputs >> pinNumber) & 1 != 0)
+                }
             }
         }
     }
