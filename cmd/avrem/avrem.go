@@ -33,7 +33,9 @@ func runEmulator() {
     
     go em.Run(clk.Spawn(1))
     
-    clk.Tick(1e6)
+    for i := 0; i < 1e8; i++ {
+        clk.Tick(10)
+    }
     
     fmt.Println("OK.")
 }
@@ -59,6 +61,7 @@ func setupIO(em *emulator.Emulator, clk *clock.Master) {
     gpioB.AddTo(em)
     
     t0 := timer.New(0)
+    t0.SetLogging(true)
     t0.AddTo(em)
     go t0.Run(clk.Spawn(1))
 }

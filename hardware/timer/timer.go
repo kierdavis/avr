@@ -10,6 +10,7 @@ import (
     "github.com/kierdavis/avr/clock"
     "github.com/kierdavis/avr/emulator"
     "github.com/kierdavis/avr/hardware/gpio"
+    "log"
 )
 
 // TODO: for a OSCx output, require corresponding DDR bit to be set to output
@@ -30,12 +31,17 @@ type Timer struct {
     downwards bool // count direction
     ocPinStates [2]bool
     ocPinCallbacks [2]func(bool)
+    logging bool
 }
 
 func New(digit uint) (t *Timer) {
     return &Timer{
         digit: digit,
     }
+}
+
+func (t *Timer) SetLogging(enabled bool) {
+    t.logging = enabled
 }
 
 func (t *Timer) AddTo(em *emulator.Emulator) {
@@ -112,6 +118,12 @@ func (t *Timer) Tick() {
     } else {
         t.count++
     }
+    
+    /*
+    if t.logging {
+        log.Printf("[avr/hardware/timer:(*Timer).tick] ticked, count is now $%02X", t.count)
+    }
+    */
 }
 
 // Tick the timer in Normal mode.
@@ -291,6 +303,9 @@ func (p tccra) Read() uint8 {
 }
 
 func (p tccra) Write(x uint8) {
+    if p.t.logging {
+        log.Printf("[avr/hardware/timer:tccrb.Write] $%02X (%08b) written to TCCRxA", x, x)
+    }
     p.t.controlA = x
 }
 
@@ -304,6 +319,9 @@ func (p tccrb) Read() uint8 {
 }
 
 func (p tccrb) Write(x uint8) {
+    if p.t.logging {
+        log.Printf("[avr/hardware/timer:tccrb.Write] $%02X (%08b) written to TCCRxB", x, x)
+    }
     p.t.controlB = x
 }
 
