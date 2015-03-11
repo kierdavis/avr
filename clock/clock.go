@@ -39,3 +39,9 @@ func (s *Slave) Tick(ticks uint) {
 func (s *Slave) Wait() {
     <-s.ch
 }
+
+func (s *Slave) WaitN(n int) {
+    for i := 0; i < n; i++ {
+        <-s.ch
+    }
+}

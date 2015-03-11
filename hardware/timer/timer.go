@@ -7,6 +7,7 @@ package timer
 
 import (
     "fmt"
+    "github.com/kierdavis/avr/clock"
     "github.com/kierdavis/avr/emulator"
     "github.com/kierdavis/avr/hardware/gpio"
 )
@@ -14,6 +15,8 @@ import (
 // TODO: for a OSCx output, require corresponding DDR bit to be set to output
 
 // TODO: writing to TCNT prevents a compare match on the next clock
+
+// TODO: thread-safety!!
 
 type Timer struct {
     digit uint
@@ -49,6 +52,31 @@ func (t *Timer) AddTo(em *emulator.Emulator) {
 // OverrideOutput method.
 func (t *Timer) OverrideOCPin(ocPinNum uint, gpioPinNum uint, g *gpio.GPIO) {
     t.ocPinCallbacks[ocPinNum] = g.OverrideOutput(gpioPinNum)
+}
+
+// Run the timer off the specified clock.
+func (t *Timer) Run(clk *clock.Slave) {
+    for {
+        switch t.controlB & 0x07 {
+        case 0: // No clock source (timer stopped)
+            clk.Wait()
+            continue // try again
+        
+        // System clock with prescaler
+        case 1: clk.Wait()
+        case 2: clk.WaitN(8)
+        case 3: clk.WaitN(64)
+        case 4: clk.WaitN(256)
+        case 5: clk.WaitN(1024)
+        
+        case 6: // T0 pin, falling edge
+            panic("(*Timer).Run: external clock sources not implemented")
+        case 7: // T0 pin, rising edge
+            panic("(*Timer).Run: external clock sources not implemented")
+        }
+        
+        t.Tick()
+    }
 }
 
 // Note: in PWM modes, OCRA/OCRB do not exhibit a newly written value until the count overflows

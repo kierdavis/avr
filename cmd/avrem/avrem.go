@@ -24,12 +24,13 @@ func main() {
 }
 
 func runEmulator() {
+    clk := clock.New()
+    
     em := emulator.NewEmulator(spec.ATmega168)
     em.LogWarnings(true)
     loadProgram(em)
-    setupIO(em)
+    setupIO(em, clk)
     
-    clk := clock.New()
     go em.Run(clk.Spawn(1))
     
     clk.Tick(1e6)
@@ -52,13 +53,14 @@ func loadProgram(em *emulator.Emulator) {
     }
 }
 
-func setupIO(em *emulator.Emulator) {
+func setupIO(em *emulator.Emulator, clk *clock.Master) {
     gpioB := gpio.New('B', 8)
     gpioB.SetOutputAdapter(5, &PrintingOutputPinAdapter{Label: "LED"})
     gpioB.AddTo(em)
     
     t0 := timer.New(0)
     t0.AddTo(em)
+    go t0.Run(clk.Spawn(1))
 }
 
 type PrintingOutputPinAdapter struct {
