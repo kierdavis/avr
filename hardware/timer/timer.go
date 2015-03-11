@@ -11,6 +11,8 @@ import (
     "github.com/kierdavis/avr/emulator"
     "github.com/kierdavis/avr/hardware/gpio"
     "log"
+    
+    "time"
 )
 
 // TODO: for a OSCx output, require corresponding DDR bit to be set to output
@@ -70,10 +72,19 @@ func (t *Timer) OverrideOCPin(ocPinNum uint, gpioPinNum uint, g *gpio.GPIO) {
 func (t *Timer) Run(clk clock.Clock) {
     // TODO: implement clock source selector again
     
+    k := 1000
+    
     for {
-        now := clk.Now()
-        t.Tick()
-        clk.Await(now + 1)
+        t1 := time.Now()
+        for i := 0; i < k; i++ {
+            //now := clk.Now()
+            t.Tick()
+            //clk.Await(now + 1)
+        }
+        t2 := time.Now()
+        
+        secs := float64(t2.Sub(t1)) / float64(time.Second)
+        fmt.Printf("%d ticks in %f secs (%f Mticks/sec)\n", k, secs, (float64(k) / secs) / 1e6)
     }
 }
 
