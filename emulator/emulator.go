@@ -3,6 +3,7 @@ package emulator
 import (
     "fmt"
     "github.com/kierdavis/avr"
+    "github.com/kierdavis/avr/clock"
     "github.com/kierdavis/avr/spec"
     "os"
 )
@@ -88,26 +89,29 @@ func (em *Emulator) UnregisterPortByName(name string) (ok bool) {
     return true
 }
 
-func (em *Emulator) Run(cycles int) {
+func (em *Emulator) Run(clk *clock.Slave) {
     reducedCore := em.Spec.Family == spec.ReducedCore
     
-    for cycles > 0 {
+    for {
         word := em.fetchProgWord()
         inst := Decode(word, reducedCore)
         if inst < 0 {
             em.warn(InvalidInstructionWarning{em.pc - 1, word})
-            cycles--
+            clk.Wait()
             continue
         }
         
         if !em.Spec.Available[inst] {
             em.warn(UnavailableInstructionWarning{em.pc - 1, inst, em.Spec})
-            cycles--
+            clk.Wait()
             continue
         }
 
         handler := handlers[inst]
-        cycles -= handler(em, word)
+        cycles := handler(em, word)
+        for i := 0; i < cycles; i++ {
+            clk.Wait()
+        }
     }
 }
 

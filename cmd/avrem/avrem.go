@@ -3,6 +3,7 @@ package main
 import (
     "flag"
     "fmt"
+    "github.com/kierdavis/avr/clock"
     "github.com/kierdavis/avr/emulator"
     "github.com/kierdavis/avr/hardware/gpio"
     "github.com/kierdavis/avr/loader/ihexloader"
@@ -27,9 +28,10 @@ func runEmulator() {
     loadProgram(em)
     setupIO(em)
     
-    for {
-        em.Run(1e5)
-    }
+    clk := clock.New()
+    go em.Run(clk.Spawn(1))
+    
+    clk.Tick(1e6)
     
     fmt.Println("OK.")
 }
