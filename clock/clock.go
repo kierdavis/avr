@@ -77,14 +77,33 @@ func (m *Master) TickN(n uint) {
 }
 
 func (m *Master) Run(period time.Duration, stop Signal) {
-    ticker := time.Tick(period)
+    batchSize := 100
+    
+    batchStartTime := time.Now()
     for {
-        select {
-        case <-stop.C:
-            return
-        case <-ticker:
-            m.Tick()
-        }
+        //k := 10000
+        //t1 := time.Now()
+        //for i := 0; i < k; i++ {
+            batchStartTime = batchStartTime.Add(period * time.Duration(batchSize))
+            sleepTime := batchStartTime.Sub(time.Now())
+            if sleepTime > 0 {
+                time.Sleep(sleepTime)
+            }
+            
+            for j := 0; j < batchSize; j++ {
+                m.Tick()
+            }
+            
+            select {
+            case <-stop.C:
+                return
+            default:
+            }
+        //}
+        //t2 := time.Now()
+        //
+        //secs := float64(t2.Sub(t1)) / float64(time.Second)
+        //fmt.Printf("%d ticks in %f msecs\t(effective freq %f MHz)\n", k*batchSize, secs * 1e3, (float64(k*batchSize) / secs) / 1e6)
     }
 }
 
