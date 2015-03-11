@@ -88,15 +88,24 @@ func (em *Emulator) UnregisterPortByName(name string) (ok bool) {
 }
 
 func (em *Emulator) InterruptsEnabled() bool {
-    return em.Flags[avr.FlagI] != 0
+    return em.flags[avr.FlagI] != 0
 }
 
 func (em *Emulator) Interrupt(num uint) {
-    panic("unimplemented")
+    if em.InterruptsEnabled() {
+        em.flags[avr.FlagI] = 0
+        em.pushPC()
+        em.pc = uint32(num * em.Spec.InterruptVectorSize)
+    }
 }
 
-func (em *Emulator) InterruptByName(name string) {
-    panic("unimplemented")
+func (em *Emulator) InterruptByName(name string) (ok bool) {
+    num, ok := em.Spec.Interrupts[name]
+    if !ok {
+        return false
+    }
+    em.Interrupt(num)
+    return true
 }
 
 func (em *Emulator) Run(clk clock.Clock) {
