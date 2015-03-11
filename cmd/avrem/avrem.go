@@ -41,7 +41,7 @@ func runEmulator() {
         stopSig.Trigger()
     }()
     
-    freq := 1e6 // 1 MHz
+    freq := 10e6 // 10 MHz
     clk.Run(time.Second / time.Duration(freq), stopSig)
     
     fmt.Println("OK.")
