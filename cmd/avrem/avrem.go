@@ -3,7 +3,6 @@ package main
 import (
     "flag"
     "fmt"
-    "github.com/kierdavis/avr/clock"
     "github.com/kierdavis/avr/emulator"
     "github.com/kierdavis/avr/hardware/gpio"
     "github.com/kierdavis/avr/hardware/timer"
@@ -12,6 +11,8 @@ import (
     "os"
     "time"
 )
+
+var totalTicks uint64
 
 func main() {
     flag.Parse()
@@ -25,24 +26,28 @@ func main() {
 }
 
 func runEmulator() {
-    clk := clock.New()
-    
     em := emulator.NewEmulator(spec.ATmega168)
     em.SetLogging(true)
     
     loadProgram(em)
-    setupIO(em, clk)
+    t0 := setupIO(em)
+    _ = t0
     
-    go em.Run(clk)
-    
-    stopSig := clock.NewSignal()
-    go func() {
-        time.Sleep(time.Second * 5)
-        stopSig.Trigger()
-    }()
-    
-    freq := 10e6 // 10 MHz
-    clk.Run(time.Second / time.Duration(freq), stopSig)
+    // main loop
+    m := 20
+    n := 10000000 / m
+    for {
+        t1 := time.Now()
+        for i := 0; i < n; i++ {
+            em.Run(uint(m))
+            t0.Run(uint(m))
+            totalTicks += uint64(m)
+        }
+        t2 := time.Now()
+        
+        secs := float64(t2.Sub(t1)) / float64(time.Second)
+        fmt.Printf("Running at: %f MHz (%f ns/tick)\n", float64(n*m) / (secs * 1e6), (secs * 1e9) / float64(n*m))
+    }
     
     fmt.Println("OK.")
 }
@@ -62,7 +67,7 @@ func loadProgram(em *emulator.Emulator) {
     }
 }
 
-func setupIO(em *emulator.Emulator, clk clock.Clock) {
+func setupIO(em *emulator.Emulator) (t *timer.Timer) {
     gpioB := gpio.New('B', 8)
     gpioB.SetOutputAdapter(5, &PrintingOutputPinAdapter{Label: "LED"})
     gpioB.AddTo(em)
@@ -70,7 +75,7 @@ func setupIO(em *emulator.Emulator, clk clock.Clock) {
     t0 := timer.New(0)
     t0.SetLogging(true)
     t0.AddTo(em)
-    go t0.Run(clk)
+    return t0
 }
 
 type PrintingOutputPinAdapter struct {
@@ -82,11 +87,11 @@ func (a *PrintingOutputPinAdapter) SetState(state bool) {
     if state != a.Prev {
         a.Prev = state
         if state {
-            fmt.Printf("%s changed to high\n", a.Label)
+            fmt.Printf("{%d} %s changed to high\n", totalTicks / 16e6, a.Label)
         } else {
-            fmt.Printf("%s changed to low\n", a.Label)
+            fmt.Printf("{%d} %s changed to low\n", totalTicks / 16e6, a.Label)
         }
     } else {
-        fmt.Printf("%s remained the same\n", a.Label)
+        fmt.Printf("{%d} %s remained the same\n", totalTicks / 16e6, a.Label)
     }
 }

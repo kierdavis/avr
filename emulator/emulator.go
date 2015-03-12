@@ -2,7 +2,6 @@ package emulator
 
 import (
     "github.com/kierdavis/avr"
-    "github.com/kierdavis/avr/clock"
     "github.com/kierdavis/avr/spec"
     "log"
 )
@@ -24,6 +23,7 @@ type Emulator struct {
     regs        [32]uint8
     flags       [8]uint8
     logging     bool
+    excessTicks uint
 }
 
 // NewEmulator creates and returns an initialised Emulator for the given MCUSpec.
@@ -93,6 +93,7 @@ func (em *Emulator) InterruptsEnabled() bool {
 
 func (em *Emulator) Interrupt(num uint) {
     if em.InterruptsEnabled() {
+        //log.Printf("int %d (mem = $%02x $%02x $%02x $%02x)", num, em.loadDataByte(0x0106), em.loadDataByte(0x0107), em.loadDataByte(0x0108), em.loadDataByte(0x0109))
         em.flags[avr.FlagI] = 0
         em.pushPC()
         em.pc = uint32(num * em.Spec.InterruptVectorSize)
@@ -108,31 +109,32 @@ func (em *Emulator) InterruptByName(name string) (ok bool) {
     return true
 }
 
-func (em *Emulator) Run(clk clock.Clock) {
+func (em *Emulator) Run(ticks uint) {
+    // subtract ticks that were executed on the last call to Run
+    ticksExecuted := em.excessTicks
+    
     reducedCore := em.Spec.Family == spec.ReducedCore
     
-    for {
-        now := clk.Now()
-        
+    for ticksExecuted < ticks {
         word := em.fetchProgWord()
         inst := Decode(word, reducedCore)
         if inst < 0 {
             em.warn(InvalidInstructionWarning{em.pc - 1, word})
-            clk.Await(now + 1)
+            ticksExecuted++
             continue
         }
         
         if !em.Spec.Available[inst] {
             em.warn(UnavailableInstructionWarning{em.pc - 1, inst, em.Spec})
-            clk.Await(now + 1)
+            ticksExecuted++
             continue
         }
 
         handler := handlers[inst]
-        cycles := handler(em, word)
-        
-        clk.Await(now + uint64(cycles))
+        ticksExecuted += uint(handler(em, word))
     }
+    
+    em.excessTicks = ticksExecuted - ticks
 }
 
 // Copy program words from buf into program memory starting at the given address.
