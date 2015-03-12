@@ -1308,6 +1308,8 @@ func doSBCI(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagZ] &= b2i(x == 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
+    // store result
+    em.regs[d] = x
     return 1
 }
 
