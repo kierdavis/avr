@@ -10,7 +10,7 @@ import (
 type Emulator struct {
     Spec        *spec.MCUSpec
     regions     []Region
-    ports       map[avr.PortRef]Port
+    ports       [][]Port
     prog        []uint16
     ram         []uint8
     pc          uint32
@@ -32,11 +32,15 @@ func NewEmulator(mcuSpec *spec.MCUSpec) (em *Emulator) {
     em = &Emulator{
         Spec:        mcuSpec,
         regions:     make([]Region, len(mcuSpec.Regions)),
-        ports:       make(map[avr.PortRef]Port),
+        ports:       make([][]Port, len(mcuSpec.IOBankSizes)),
         prog:        make([]uint16, 1<<mcuSpec.LogProgMemSize),
         ram:         make([]uint8, 1<<mcuSpec.LogRAMSize),
         pc:          0,
         pcmask:      (1 << mcuSpec.LogProgMemSize) - 1,
+    }
+    
+    for i := range em.ports {
+        em.ports[i] = make([]Port, mcuSpec.IOBankSizes[i])
     }
 
     // register standard ports
@@ -64,7 +68,7 @@ func (em *Emulator) SetLogging(enabled bool) {
 }
 
 func (em *Emulator) RegisterPort(pref avr.PortRef, port Port) {
-    em.ports[pref] = port
+    em.ports[pref.BankNum][pref.Index] = port
 }
 
 func (em *Emulator) RegisterPortByName(name string, port Port) (ok bool) {
@@ -77,7 +81,7 @@ func (em *Emulator) RegisterPortByName(name string, port Port) (ok bool) {
 }
 
 func (em *Emulator) UnregisterPort(pref avr.PortRef) {
-    delete(em.ports, pref)
+    em.ports[pref.BankNum][pref.Index] = nil
 }
 
 func (em *Emulator) UnregisterPortByName(name string) (ok bool) {
@@ -214,8 +218,8 @@ func (em *Emulator) popPC() {
 }
 
 func (em *Emulator) readPort(bankNum uint, index uint16) uint8 {
-    port, ok := em.ports[avr.PortRef{bankNum, index}]
-    if !ok {
+    port := em.ports[bankNum][index]
+    if port == nil {
         em.warn(UnmappedPortWarning{em.pc - 1, bankNum, index})
         return 0
     }
@@ -224,8 +228,8 @@ func (em *Emulator) readPort(bankNum uint, index uint16) uint8 {
 }
 
 func (em *Emulator) writePort(bankNum uint, index uint16, val uint8) {
-    port, ok := em.ports[avr.PortRef{bankNum, index}]
-    if !ok {
+    port := em.ports[bankNum][index]
+    if port == nil {
         em.warn(UnmappedPortWarning{em.pc - 1, bankNum, index})
         return
     }
