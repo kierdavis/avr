@@ -156,9 +156,7 @@ func (em *Emulator) fetchProgWord() (word uint16) {
 func (em *Emulator) demap(addr uint16) (r Region) {
     // TODO: optimise
     for _, r := range em.regions {
-        s := r.Spec()
-        //if addr >= s.Start() && addr < (s.Start() + s.Size()) {
-        if (addr - s.Start()) < s.Size() {
+        if r.Contains(addr) {
             return r
         }
     }
@@ -169,7 +167,7 @@ func (em *Emulator) demap(addr uint16) (r Region) {
 func (em *Emulator) loadDataByte(addr uint16) uint8 {
     r := em.demap(addr)
     if r != nil {
-        return r.Load(addr - r.Spec().Start())
+        return r.Load(addr)
     } else {
         em.warn(UnmappedAddressWarning{em.pc - 1, addr})
         return 0
@@ -179,7 +177,7 @@ func (em *Emulator) loadDataByte(addr uint16) uint8 {
 func (em *Emulator) storeDataByte(addr uint16, val uint8) {
     r := em.demap(addr)
     if r != nil {
-        r.Store(addr - r.Spec().Start(), val)
+        r.Store(addr, val)
     } else {
         em.warn(UnmappedAddressWarning{em.pc - 1, addr})
     }
