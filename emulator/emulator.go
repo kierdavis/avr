@@ -119,7 +119,7 @@ func (em *Emulator) Run(ticks uint) {
     
     for ticksExecuted < ticks {
         word := em.fetchProgWord()
-        inst := Decode(word, reducedCore)
+        inst := DecodeLut(word, reducedCore)
         if inst < 0 {
             em.warn(InvalidInstructionWarning{em.pc - 1, word})
             ticksExecuted++
