@@ -5,7 +5,7 @@ import (
     "github.com/kierdavis/avr/spec"
 )
 
-type instHandler func(*Emulator, uint16) int
+type instHandler func(*Emulator, uint16) uint
 
 var handlers = [...]instHandler{
     doADC,
@@ -120,7 +120,7 @@ func init() {
 }
 
 // add with carry
-func doADC(em *Emulator, word uint16) (cycles int) {
+func doADC(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -144,7 +144,7 @@ func doADC(em *Emulator, word uint16) (cycles int) {
 }
 
 // add
-func doADD(em *Emulator, word uint16) (cycles int) {
+func doADD(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -168,7 +168,7 @@ func doADD(em *Emulator, word uint16) (cycles int) {
 }
 
 // add immediate to word
-func doADIW(em *Emulator, word uint16) (cycles int) {
+func doADIW(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 24 + ((word & 0x0030) >> 3)
     k := ((word & 0x00C0) >> 2) | (word & 0x000F)
@@ -189,7 +189,7 @@ func doADIW(em *Emulator, word uint16) (cycles int) {
 }
 
 // bitwise AND
-func doAND(em *Emulator, word uint16) (cycles int) {
+func doAND(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -209,7 +209,7 @@ func doAND(em *Emulator, word uint16) (cycles int) {
 }
 
 // bitwise AND with immediate
-func doANDI(em *Emulator, word uint16) (cycles int) {
+func doANDI(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x00F0) >> 4)
     k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
@@ -228,7 +228,7 @@ func doANDI(em *Emulator, word uint16) (cycles int) {
 }
 
 // arithmetic shift right
-func doASR(em *Emulator, word uint16) (cycles int) {
+func doASR(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     // get operands
@@ -247,14 +247,14 @@ func doASR(em *Emulator, word uint16) (cycles int) {
 }
 
 // clear flag bit
-func doBCLR(em *Emulator, word uint16) (cycles int) {
+func doBCLR(em *Emulator, word uint16) (cycles uint) {
     s := (word & 0x0070) >> 4
     em.flags[s] = 0
     return 1
 }
 
 // bit load (copy flag T to bit in register)
-func doBLD(em *Emulator, word uint16) (cycles int) {
+func doBLD(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     b := word & 0x0007
     em.regs[d] = (em.regs[d] & ^(1 << b)) | (em.flags[avr.FlagT] << b)
@@ -262,7 +262,7 @@ func doBLD(em *Emulator, word uint16) (cycles int) {
 }
 
 // branch if flag bit cleared
-func doBRBC(em *Emulator, word uint16) (cycles int) {
+func doBRBC(em *Emulator, word uint16) (cycles uint) {
     s := word & 0x0007
     if em.flags[s] == 0 {
         em.pc += uint32((int32(word&0x03F8) << 22) >> 25)
@@ -272,7 +272,7 @@ func doBRBC(em *Emulator, word uint16) (cycles int) {
 }
 
 // branch if flag bit set
-func doBRBS(em *Emulator, word uint16) (cycles int) {
+func doBRBS(em *Emulator, word uint16) (cycles uint) {
     s := word & 0x0007
     if em.flags[s] != 0 {
         em.pc += uint32((int32(word&0x03F8) << 22) >> 25)
@@ -282,20 +282,20 @@ func doBRBS(em *Emulator, word uint16) (cycles int) {
 }
 
 // breakpoint
-func doBREAK(em *Emulator, word uint16) (cycles int) {
+func doBREAK(em *Emulator, word uint16) (cycles uint) {
     panic("doBREAK: unimplemented")
     return 1
 }
 
 // clear flag bit
-func doBSET(em *Emulator, word uint16) (cycles int) {
+func doBSET(em *Emulator, word uint16) (cycles uint) {
     s := (word & 0x0070) >> 4
     em.flags[s] = 1
     return 1
 }
 
 // bit store (copy bit in register to flag T)
-func doBST(em *Emulator, word uint16) (cycles int) {
+func doBST(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     b := word & 0x0007
     em.flags[avr.FlagT] = (em.regs[d] >> b) & 1
@@ -303,7 +303,7 @@ func doBST(em *Emulator, word uint16) (cycles int) {
 }
 
 // long call
-func doCALL(em *Emulator, word uint16) (cycles int) {
+func doCALL(em *Emulator, word uint16) (cycles uint) {
     kh := ((word & 0x01F0) >> 3) | (word & 0x0001)
     kl := em.fetchProgWord()
     k := (uint32(kh) << 32) | uint32(kl)
@@ -325,7 +325,7 @@ func doCALL(em *Emulator, word uint16) (cycles int) {
 }
 
 // clear bit in I/O port
-func doCBI(em *Emulator, word uint16) (cycles int) {
+func doCBI(em *Emulator, word uint16) (cycles uint) {
     a := (word & 0x00F8) >> 3
     b := word & 0x0007
 
@@ -340,7 +340,7 @@ func doCBI(em *Emulator, word uint16) (cycles int) {
 }
 
 // complement bits
-func doCOM(em *Emulator, word uint16) (cycles int) {
+func doCOM(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     // get operand & compute result
@@ -357,7 +357,7 @@ func doCOM(em *Emulator, word uint16) (cycles int) {
 }
 
 // compare
-func doCP(em *Emulator, word uint16) (cycles int) {
+func doCP(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -379,7 +379,7 @@ func doCP(em *Emulator, word uint16) (cycles int) {
 }
 
 // compare with carry
-func doCPC(em *Emulator, word uint16) (cycles int) {
+func doCPC(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -401,7 +401,7 @@ func doCPC(em *Emulator, word uint16) (cycles int) {
 }
 
 // compare with immedate
-func doCPI(em *Emulator, word uint16) (cycles int) {
+func doCPI(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x00F0) >> 4)
     k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
@@ -422,7 +422,7 @@ func doCPI(em *Emulator, word uint16) (cycles int) {
 }
 
 // compare and skip if equal
-func doCPSE(em *Emulator, word uint16) (cycles int) {
+func doCPSE(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -437,7 +437,7 @@ func doCPSE(em *Emulator, word uint16) (cycles int) {
 }
 
 // decrement
-func doDEC(em *Emulator, word uint16) (cycles int) {
+func doDEC(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x00F0) >> 4)
     // get operands
@@ -455,7 +455,7 @@ func doDEC(em *Emulator, word uint16) (cycles int) {
 }
 
 // DES encryption
-func doDES(em *Emulator, word uint16) (cycles int) {
+func doDES(em *Emulator, word uint16) (cycles uint) {
     k := (word & 0x00F0) >> 4
     
     panic("doDES: unimplemented")
@@ -465,7 +465,7 @@ func doDES(em *Emulator, word uint16) (cycles int) {
 }
 
 // extended indirect call
-func doEICALL(em *Emulator, word uint16) (cycles int) {
+func doEICALL(em *Emulator, word uint16) (cycles uint) {
     em.pushPC()
     em.pc = (uint32(em.eind) << 16) | (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
 
@@ -477,14 +477,14 @@ func doEICALL(em *Emulator, word uint16) (cycles int) {
 }
 
 // extended indirect jump
-func doEIJMP(em *Emulator, word uint16) (cycles int) {
+func doEIJMP(em *Emulator, word uint16) (cycles uint) {
     em.pc = (uint32(em.eind) << 16) | (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
 
     return 2
 }
 
 // extended load from program memory (destination implied to be r0)
-func doELPM_R0(em *Emulator, word uint16) (cycles int) {
+func doELPM_R0(em *Emulator, word uint16) (cycles uint) {
     addr := (uint32(em.rampz) << 16) | (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
     x := em.prog[addr >> 1]
     
@@ -499,7 +499,7 @@ func doELPM_R0(em *Emulator, word uint16) (cycles int) {
 }
 
 // extended load from program memory
-func doELPM(em *Emulator, word uint16) (cycles int) {
+func doELPM(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     
     addr := (uint32(em.rampz) << 16) | (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
@@ -516,7 +516,7 @@ func doELPM(em *Emulator, word uint16) (cycles int) {
 }
 
 // extended load from program memory (post-increment)
-func doELPM_INC(em *Emulator, word uint16) (cycles int) {
+func doELPM_INC(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     
     addr := (uint32(em.rampz) << 16) | (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
@@ -539,7 +539,7 @@ func doELPM_INC(em *Emulator, word uint16) (cycles int) {
 }
 
 // bitwise exclusive OR
-func doEOR(em *Emulator, word uint16) (cycles int) {
+func doEOR(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -559,7 +559,7 @@ func doEOR(em *Emulator, word uint16) (cycles int) {
 }
 
 // unsigned fixed-point multiply
-func doFMUL(em *Emulator, word uint16) (cycles int) {
+func doFMUL(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x0070) >> 4)
     r := 16 + (word & 0x0007)
@@ -580,7 +580,7 @@ func doFMUL(em *Emulator, word uint16) (cycles int) {
 }
 
 // signed fixed-point multiply
-func doFMULS(em *Emulator, word uint16) (cycles int) {
+func doFMULS(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x0070) >> 4)
     r := 16 + (word & 0x0007)
@@ -601,7 +601,7 @@ func doFMULS(em *Emulator, word uint16) (cycles int) {
 }
 
 // fixed-point multiply with one signed operand & one unsigned operand
-func doFMULSU(em *Emulator, word uint16) (cycles int) {
+func doFMULSU(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x0070) >> 4)
     r := 16 + (word & 0x0007)
@@ -622,7 +622,7 @@ func doFMULSU(em *Emulator, word uint16) (cycles int) {
 }
 
 // indirect call
-func doICALL(em *Emulator, word uint16) (cycles int) {
+func doICALL(em *Emulator, word uint16) (cycles uint) {
     em.pushPC()
     em.pc = (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
 
@@ -640,13 +640,13 @@ func doICALL(em *Emulator, word uint16) (cycles int) {
 }
 
 // indirect jump
-func doIJMP(em *Emulator, word uint16) (cycles int) {
+func doIJMP(em *Emulator, word uint16) (cycles uint) {
     em.pc = (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
     return 2
 }
 
 // read I/O port
-func doIN(em *Emulator, word uint16) (cycles int) {
+func doIN(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     a := ((word & 0x0600) >> 5) | (word & 0x000F)
     em.regs[d] = em.readPort(0, a)
@@ -654,7 +654,7 @@ func doIN(em *Emulator, word uint16) (cycles int) {
 }
 
 // increment
-func doINC(em *Emulator, word uint16) (cycles int) {
+func doINC(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     // get operands
@@ -672,7 +672,7 @@ func doINC(em *Emulator, word uint16) (cycles int) {
 }
 
 // long jump
-func doJMP(em *Emulator, word uint16) (cycles int) {
+func doJMP(em *Emulator, word uint16) (cycles uint) {
     kh := ((word & 0x01F0) >> 3) | (word & 0x0001)
     kl := em.fetchProgWord()
     em.pc = (uint32(kh) << 32) | uint32(kl)
@@ -681,7 +681,7 @@ func doJMP(em *Emulator, word uint16) (cycles int) {
 
 // load and clear
 // Note: may be buggy as this instruction is not fully documented in the AVR spec.
-func doLAC(em *Emulator, word uint16) (cycles int) {
+func doLAC(em *Emulator, word uint16) (cycles uint) {
     // Rd <- [Z]
     // [Z] <- [Z] & ~(old value of Rd)
     
@@ -711,7 +711,7 @@ func doLAC(em *Emulator, word uint16) (cycles int) {
 
 // load and set
 // Note: may be buggy as this instruction is not fully documented in the AVR spec.
-func doLAS(em *Emulator, word uint16) (cycles int) {
+func doLAS(em *Emulator, word uint16) (cycles uint) {
     // Rd <- [Z]
     // [Z] <- [Z] | old value of Rd
     
@@ -741,7 +741,7 @@ func doLAS(em *Emulator, word uint16) (cycles int) {
 
 // load and toggle
 // Note: may be buggy as this instruction is not fully documented in the AVR spec.
-func doLAT(em *Emulator, word uint16) (cycles int) {
+func doLAT(em *Emulator, word uint16) (cycles uint) {
     // Rd <- [Z]
     // [Z] <- [Z] ^ old value of Rd
     
@@ -778,7 +778,7 @@ func doLAT(em *Emulator, word uint16) (cycles int) {
 //   ptrLoReg: number of low register used for pointer (X => 26, Y => 28, Z => 30)
 //             ptrHiReg is implied to be ptrLoReg+1 (X => 27, Y => 29, Z => 31)
 //   ptrExt: reference to either em.rampx, em.rampy or em.rampz, depending on the pointer used.
-func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *uint8) (cycles int) {
+func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *uint8) (cycles uint) {
     ptrHiReg := ptrLoReg + 1
     d := (word & 0x01F0) >> 4
     
@@ -856,62 +856,62 @@ func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *u
 }
 
 // load using pointer X
-func doLD_X(em *Emulator, word uint16) (cycles int) {
+func doLD_X(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, ' ', 26, &em.rampx)
 }
 
 // load using pointer X (post-increment)
-func doLD_X_INC(em *Emulator, word uint16) (cycles int) {
+func doLD_X_INC(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, '+', 26, &em.rampx)
 }
 
 // load using pointer X (pre-decrement)
-func doLD_X_DEC(em *Emulator, word uint16) (cycles int) {
+func doLD_X_DEC(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, '-', 26, &em.rampx)
 }
 
 // load using pointer Y
-func doLD_Y(em *Emulator, word uint16) (cycles int) {
+func doLD_Y(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, ' ', 28, &em.rampy)
 }
 
 // load using pointer Y (post-increment)
-func doLD_Y_INC(em *Emulator, word uint16) (cycles int) {
+func doLD_Y_INC(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, '+', 28, &em.rampy)
 }
 
 // load using pointer Y (pre-decrement)
-func doLD_Y_DEC(em *Emulator, word uint16) (cycles int) {
+func doLD_Y_DEC(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, '-', 28, &em.rampy)
 }
 
 // load using pointer Y with displacement
-func doLDD_Y(em *Emulator, word uint16) (cycles int) {
+func doLDD_Y(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, 'd', 28, &em.rampy)
 }
 
 // load using pointer Z
-func doLD_Z(em *Emulator, word uint16) (cycles int) {
+func doLD_Z(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, ' ', 30, &em.rampz)
 }
 
 // load using pointer Z (post-increment)
-func doLD_Z_INC(em *Emulator, word uint16) (cycles int) {
+func doLD_Z_INC(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, '+', 30, &em.rampz)
 }
 
 // load using pointer Z (pre-decrement)
-func doLD_Z_DEC(em *Emulator, word uint16) (cycles int) {
+func doLD_Z_DEC(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, '-', 30, &em.rampz)
 }
 
 // load using pointer Z with displacement
-func doLDD_Z(em *Emulator, word uint16) (cycles int) {
+func doLDD_Z(em *Emulator, word uint16) (cycles uint) {
     return doGenericLoad(em, word, 'd', 30, &em.rampz)
 }
 
 // load immediate
-func doLDI(em *Emulator, word uint16) (cycles int) {
+func doLDI(em *Emulator, word uint16) (cycles uint) {
     k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
     d := 16 + ((word & 0x00F0) >> 4)
     em.regs[d] = k
@@ -919,7 +919,7 @@ func doLDI(em *Emulator, word uint16) (cycles int) {
 }
 
 // load from literal address
-func doLDS(em *Emulator, word uint16) (cycles int) {
+func doLDS(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     k := em.fetchProgWord()
     
@@ -933,7 +933,7 @@ func doLDS(em *Emulator, word uint16) (cycles int) {
 }
 
 // load from literal address (reduced core form of LDS)
-func doLDS_SHORT(em *Emulator, word uint16) (cycles int) {
+func doLDS_SHORT(em *Emulator, word uint16) (cycles uint) {
     d := 16 + ((word & 0x00F0) >> 4)
     k := ((^word & 0x0100) >> 1) | ((word & 0x0100) >> 2) | ((word & 0x0600) >> 5) | (word & 0x000F)
     
@@ -947,7 +947,7 @@ func doLDS_SHORT(em *Emulator, word uint16) (cycles int) {
 }
 
 // load from program memory (destinated implied to be r0)
-func doLPM_R0(em *Emulator, word uint16) (cycles int) {
+func doLPM_R0(em *Emulator, word uint16) (cycles uint) {
     addr := (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
     x := em.prog[addr >> 1]
     
@@ -962,7 +962,7 @@ func doLPM_R0(em *Emulator, word uint16) (cycles int) {
 }
 
 // load from program memory
-func doLPM(em *Emulator, word uint16) (cycles int) {
+func doLPM(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     
     addr := (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
@@ -979,7 +979,7 @@ func doLPM(em *Emulator, word uint16) (cycles int) {
 }
 
 // load from program memory (post-increment)
-func doLPM_INC(em *Emulator, word uint16) (cycles int) {
+func doLPM_INC(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     
     addr := (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
@@ -1001,7 +1001,7 @@ func doLPM_INC(em *Emulator, word uint16) (cycles int) {
 }
 
 // logical shift right
-func doLSR(em *Emulator, word uint16) (cycles int) {
+func doLSR(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     // get operands
@@ -1020,7 +1020,7 @@ func doLSR(em *Emulator, word uint16) (cycles int) {
 }
 
 // move
-func doMOV(em *Emulator, word uint16) (cycles int) {
+func doMOV(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
     em.regs[d] = em.regs[r]
@@ -1028,7 +1028,7 @@ func doMOV(em *Emulator, word uint16) (cycles int) {
 }
 
 // move word
-func doMOVW(em *Emulator, word uint16) (cycles int) {
+func doMOVW(em *Emulator, word uint16) (cycles uint) {
     d := 2 * ((word & 0x00F0) >> 4)
     r := 2 * (word & 0x000F)
     em.regs[d] = em.regs[r]
@@ -1037,7 +1037,7 @@ func doMOVW(em *Emulator, word uint16) (cycles int) {
 }
 
 // unsigned multiply
-func doMUL(em *Emulator, word uint16) (cycles int) {
+func doMUL(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -1056,7 +1056,7 @@ func doMUL(em *Emulator, word uint16) (cycles int) {
 }
 
 // signed multiply
-func doMULS(em *Emulator, word uint16) (cycles int) {
+func doMULS(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x00F0) >> 4)
     r := 16 + (word & 0x000F)
@@ -1075,7 +1075,7 @@ func doMULS(em *Emulator, word uint16) (cycles int) {
 }
 
 // multiply with one signed operand & one unsigned operand
-func doMULSU(em *Emulator, word uint16) (cycles int) {
+func doMULSU(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x0070) >> 4)
     r := 16 + (word & 0x0007)
@@ -1094,7 +1094,7 @@ func doMULSU(em *Emulator, word uint16) (cycles int) {
 }
 
 // negate
-func doNEG(em *Emulator, word uint16) (cycles int) {
+func doNEG(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     // get operand
@@ -1114,12 +1114,12 @@ func doNEG(em *Emulator, word uint16) (cycles int) {
 }
 
 // no operation
-func doNOP(em *Emulator, word uint16) (cycles int) {
+func doNOP(em *Emulator, word uint16) (cycles uint) {
     return 1
 }
 
 // bitwise OR
-func doOR(em *Emulator, word uint16) (cycles int) {
+func doOR(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -1139,7 +1139,7 @@ func doOR(em *Emulator, word uint16) (cycles int) {
 }
 
 // bitwise OR with immediate
-func doORI(em *Emulator, word uint16) (cycles int) {
+func doORI(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x00F0) >> 4)
     k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
@@ -1158,7 +1158,7 @@ func doORI(em *Emulator, word uint16) (cycles int) {
 }
 
 // write IO port
-func doOUT(em *Emulator, word uint16) (cycles int) {
+func doOUT(em *Emulator, word uint16) (cycles uint) {
     r := (word & 0x01F0) >> 4
     a := ((word & 0x0600) >> 5) | (word & 0x000F)
     em.writePort(0, a, em.regs[r])
@@ -1166,14 +1166,14 @@ func doOUT(em *Emulator, word uint16) (cycles int) {
 }
 
 // pop register from stack
-func doPOP(em *Emulator, word uint16) (cycles int) {
+func doPOP(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     em.regs[d] = em.pop()
     return 2
 }
 
 // push register to stack
-func doPUSH(em *Emulator, word uint16) (cycles int) {
+func doPUSH(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     em.push(em.regs[d])
     
@@ -1185,7 +1185,7 @@ func doPUSH(em *Emulator, word uint16) (cycles int) {
 }
 
 // relative call
-func doRCALL(em *Emulator, word uint16) (cycles int) {
+func doRCALL(em *Emulator, word uint16) (cycles uint) {
     k := int32(word & 0x0FFF)
     // sign-extend from 12 to 32 bits
     k = (k << 20) >> 20
@@ -1213,7 +1213,7 @@ func doRCALL(em *Emulator, word uint16) (cycles int) {
 }
 
 // return from subroutine
-func doRET(em *Emulator, word uint16) (cycles int) {
+func doRET(em *Emulator, word uint16) (cycles uint) {
     em.popPC()
     
     if em.Spec.LogProgMemSize > 16 {
@@ -1224,7 +1224,7 @@ func doRET(em *Emulator, word uint16) (cycles int) {
 }
 
 // return from interrupt
-func doRETI(em *Emulator, word uint16) (cycles int) {
+func doRETI(em *Emulator, word uint16) (cycles uint) {
     em.popPC()
     em.flags[avr.FlagI] = 1
 
@@ -1236,7 +1236,7 @@ func doRETI(em *Emulator, word uint16) (cycles int) {
 }
 
 // relative jump
-func doRJMP(em *Emulator, word uint16) (cycles int) {
+func doRJMP(em *Emulator, word uint16) (cycles uint) {
     k := int32(word & 0x0FFF)
     // sign-extend from 12 to 32 bits
     k = (k << 20) >> 20
@@ -1248,7 +1248,7 @@ func doRJMP(em *Emulator, word uint16) (cycles int) {
 }
 
 // rotate right through carry
-func doROR(em *Emulator, word uint16) (cycles int) {
+func doROR(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     // get operands
@@ -1267,7 +1267,7 @@ func doROR(em *Emulator, word uint16) (cycles int) {
 }
 
 // subtract with carry
-func doSBC(em *Emulator, word uint16) (cycles int) {
+func doSBC(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -1291,7 +1291,7 @@ func doSBC(em *Emulator, word uint16) (cycles int) {
 }
 
 // subtract immediate with carry
-func doSBCI(em *Emulator, word uint16) (cycles int) {
+func doSBCI(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x00F0) >> 4)
     k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
@@ -1314,7 +1314,7 @@ func doSBCI(em *Emulator, word uint16) (cycles int) {
 }
 
 // set bit in I/O port
-func doSBI(em *Emulator, word uint16) (cycles int) {
+func doSBI(em *Emulator, word uint16) (cycles uint) {
     a := (word & 0x00F8) >> 3
     b := word & 0x0007
 
@@ -1329,7 +1329,7 @@ func doSBI(em *Emulator, word uint16) (cycles int) {
 }
 
 // skip if bit in I/O port is cleared
-func doSBIC(em *Emulator, word uint16) (cycles int) {
+func doSBIC(em *Emulator, word uint16) (cycles uint) {
     a := (word & 0x00F8) >> 3
     b := word & 0x0007
     
@@ -1348,7 +1348,7 @@ func doSBIC(em *Emulator, word uint16) (cycles int) {
 }
 
 // skip if bit in I/O port is set
-func doSBIS(em *Emulator, word uint16) (cycles int) {
+func doSBIS(em *Emulator, word uint16) (cycles uint) {
     a := (word & 0x00F8) >> 3
     b := word & 0x0007
     
@@ -1367,7 +1367,7 @@ func doSBIS(em *Emulator, word uint16) (cycles int) {
 }
 
 // subtract immediate from word
-func doSBIW(em *Emulator, word uint16) (cycles int) {
+func doSBIW(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 24 + ((word & 0x0030) >> 3)
     k := ((word & 0x00C0) >> 2) | (word & 0x000F)
@@ -1388,7 +1388,7 @@ func doSBIW(em *Emulator, word uint16) (cycles int) {
 }
 
 // skip if bit in register is cleared
-func doSBRC(em *Emulator, word uint16) (cycles int) {
+func doSBRC(em *Emulator, word uint16) (cycles uint) {
     r := (word & 0x01F0) >> 4
     b := word & 0x0007
     
@@ -1400,7 +1400,7 @@ func doSBRC(em *Emulator, word uint16) (cycles int) {
 }
 
 // skip if bit in register is set
-func doSBRS(em *Emulator, word uint16) (cycles int) {
+func doSBRS(em *Emulator, word uint16) (cycles uint) {
     r := (word & 0x01F0) >> 4
     b := word & 0x0007
     
@@ -1412,19 +1412,19 @@ func doSBRS(em *Emulator, word uint16) (cycles int) {
 }
 
 // enter sleep mode
-func doSLEEP(em *Emulator, word uint16) (cycles int) {
+func doSLEEP(em *Emulator, word uint16) (cycles uint) {
     panic("doSLEEP: unimplemented")
     return 1
 }
 
 // store program memory
-func doSPM(em *Emulator, word uint16) (cycles int) {
+func doSPM(em *Emulator, word uint16) (cycles uint) {
     panic("doSPM: unimplemented")
     return 1
 }
 
 // store program memory
-func doSPM_2(em *Emulator, word uint16) (cycles int) {
+func doSPM_2(em *Emulator, word uint16) (cycles uint) {
     panic("doSPM_2: unimplemented")
     return 1
 }
@@ -1438,7 +1438,7 @@ func doSPM_2(em *Emulator, word uint16) (cycles int) {
 //   ptrLoReg: number of low register used for pointer (X => 26, Y => 28, Z => 30)
 //             ptrHiReg is implied to be ptrLoReg+1 (X => 27, Y => 29, Z => 31)
 //   ptrExt: reference to either em.rampx, em.rampy or em.rampz, depending on the pointer used.
-func doGenericStore(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *uint8) (cycles int) {
+func doGenericStore(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *uint8) (cycles uint) {
     ptrHiReg := ptrLoReg + 1
     d := (word & 0x01F0) >> 4
     
@@ -1514,62 +1514,62 @@ func doGenericStore(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *
 }
 
 // store using pointer X
-func doST_X(em *Emulator, word uint16) (cycles int) {
+func doST_X(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, ' ', 26, &em.rampx)
 }
 
 // store using pointer X (post-increment)
-func doST_X_INC(em *Emulator, word uint16) (cycles int) {
+func doST_X_INC(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, '+', 26, &em.rampx)
 }
 
 // store using pointer X (pre-decrement)
-func doST_X_DEC(em *Emulator, word uint16) (cycles int) {
+func doST_X_DEC(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, '-', 26, &em.rampx)
 }
 
 // store using pointer Y
-func doST_Y(em *Emulator, word uint16) (cycles int) {
+func doST_Y(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, ' ', 28, &em.rampy)
 }
 
 // store using pointer Y (post-increment)
-func doST_Y_INC(em *Emulator, word uint16) (cycles int) {
+func doST_Y_INC(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, '+', 28, &em.rampy)
 }
 
 // store using pointer Y (pre-decrement)
-func doST_Y_DEC(em *Emulator, word uint16) (cycles int) {
+func doST_Y_DEC(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, '-', 28, &em.rampy)
 }
 
 // store using pointer Y with displacement
-func doSTD_Y(em *Emulator, word uint16) (cycles int) {
+func doSTD_Y(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, 'd', 28, &em.rampy)
 }
 
 // store using pointer Z
-func doST_Z(em *Emulator, word uint16) (cycles int) {
+func doST_Z(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, ' ', 30, &em.rampz)
 }
 
 // store using pointer Z (post-increment)
-func doST_Z_INC(em *Emulator, word uint16) (cycles int) {
+func doST_Z_INC(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, '+', 30, &em.rampz)
 }
 
 // store using pointer Z (pre-decrement)
-func doST_Z_DEC(em *Emulator, word uint16) (cycles int) {
+func doST_Z_DEC(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, '-', 30, &em.rampz)
 }
 
 // store using pointer Z with displacement
-func doSTD_Z(em *Emulator, word uint16) (cycles int) {
+func doSTD_Z(em *Emulator, word uint16) (cycles uint) {
     return doGenericStore(em, word, 'd', 30, &em.rampz)
 }
 
 // store to literal address
-func doSTS(em *Emulator, word uint16) (cycles int) {
+func doSTS(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     k := em.fetchProgWord()
     
@@ -1583,7 +1583,7 @@ func doSTS(em *Emulator, word uint16) (cycles int) {
 }
 
 // store to literal address (reduced core form of STS)
-func doSTS_SHORT(em *Emulator, word uint16) (cycles int) {
+func doSTS_SHORT(em *Emulator, word uint16) (cycles uint) {
     d := 16 + ((word & 0x00F0) >> 4)
     k := ((^word & 0x0100) >> 1) | ((word & 0x0100) >> 2) | ((word & 0x0600) >> 5) | (word & 0x000F)
     
@@ -1597,7 +1597,7 @@ func doSTS_SHORT(em *Emulator, word uint16) (cycles int) {
 }
 
 // subtract
-func doSUB(em *Emulator, word uint16) (cycles int) {
+func doSUB(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := (word & 0x01F0) >> 4
     r := ((word & 0x0200) >> 5) | (word & 0x000F)
@@ -1621,7 +1621,7 @@ func doSUB(em *Emulator, word uint16) (cycles int) {
 }
 
 // subtract immedate
-func doSUBI(em *Emulator, word uint16) (cycles int) {
+func doSUBI(em *Emulator, word uint16) (cycles uint) {
     // extract instruction fields
     d := 16 + ((word & 0x00F0) >> 4)
     k := uint8(((word & 0x0F00) >> 4) | (word & 0x000F))
@@ -1644,7 +1644,7 @@ func doSUBI(em *Emulator, word uint16) (cycles int) {
 }
 
 // swap nibbles
-func doSWAP(em *Emulator, word uint16) (cycles int) {
+func doSWAP(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     x := em.regs[d]
     em.regs[d] = (x >> 4) | (x << 4)
@@ -1652,14 +1652,14 @@ func doSWAP(em *Emulator, word uint16) (cycles int) {
 }
 
 // watchdog reset
-func doWDR(em *Emulator, word uint16) (cycles int) {
+func doWDR(em *Emulator, word uint16) (cycles uint) {
     panic("doWDR: unimplemented")
     return 1
 }
 
 // exchange register with memory
 // Note: may be buggy as this instruction is not fully documented in the AVR spec.
-func doXCH(em *Emulator, word uint16) (cycles int) {
+func doXCH(em *Emulator, word uint16) (cycles uint) {
     // Rd <- [Z]
     // [Z] <- old value of Rd
     

@@ -137,7 +137,7 @@ func (em *Emulator) Run(ticks uint) {
         }
 
         handler := handlers[inst]
-        ticksExecuted += uint(handler(em, word))
+        ticksExecuted += handler(em, word)
     }
     
     em.excessTicks = ticksExecuted - ticks
@@ -239,7 +239,7 @@ func (em *Emulator) writePort(bankNum uint, index uint16, val uint8) {
 
 // Skip the next instruction. Returns 1 if one word was skipped or 2 if two
 // words were skipped.
-func (em *Emulator) skip() (cycles int) {
+func (em *Emulator) skip() (cycles uint) {
     word := em.fetchProgWord()
     inst := Decode(word, em.Spec.Family == spec.ReducedCore)
     if inst.IsTwoWord() {
