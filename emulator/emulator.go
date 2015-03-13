@@ -14,6 +14,7 @@ type Emulator struct {
     prog        []uint16
     ram         []uint8
     pc          uint32
+    pcmask      uint32
     sp          uint16
     rampx       uint8
     rampy       uint8
@@ -35,6 +36,7 @@ func NewEmulator(mcuSpec *spec.MCUSpec) (em *Emulator) {
         prog:        make([]uint16, 1<<mcuSpec.LogProgMemSize),
         ram:         make([]uint8, 1<<mcuSpec.LogRAMSize),
         pc:          0,
+        pcmask:      (1 << mcuSpec.LogProgMemSize) - 1,
     }
 
     // register standard ports
@@ -149,7 +151,7 @@ func (em *Emulator) WriteProg(address uint16, buf []uint16) {
 
 func (em *Emulator) fetchProgWord() (word uint16) {
     word = em.prog[em.pc]
-    em.pc = (em.pc + 1) & ((1 << em.Spec.LogProgMemSize) - 1)
+    em.pc = (em.pc + 1) & em.pcmask
     return word
 }
 
