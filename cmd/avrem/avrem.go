@@ -11,7 +11,10 @@ import (
     "github.com/kierdavis/avr/spec"
     "os"
     "log"
+    "runtime/pprof"
 )
+
+var cpuProfile = flag.String("cpuprofile", "", "filename to write profiling data to")
 
 func main() {
     flag.Parse()
@@ -19,6 +22,19 @@ func main() {
     if flag.NArg() < 1 {
         fmt.Fprintf(os.Stderr, "usage: %s <program.hex>\n", os.Args[0])
         os.Exit(2)
+    }
+    
+    if *cpuProfile != "" {
+        f, err := os.Create(*cpuProfile)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "error: %s\n", err.Error())
+            os.Exit(1)
+        }
+        pprof.StartCPUProfile(f)
+        defer func() {
+            pprof.StopCPUProfile()
+            f.Close()
+        }()
     }
     
     runEmulator()
@@ -52,7 +68,7 @@ func runEmulator() {
     }
     */
     
-    for {
+    for i := 0; i < 100; i++ {
         freq := clk.MonitorFrequency()
         log.Printf("[avr/cmd/avrem] Running at: %.1f MHz (%.1f ns/tick)", freq / 1e6, 1e9 / freq)
         
