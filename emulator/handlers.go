@@ -135,7 +135,7 @@ func doADC(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagH] = (c & 0x08) >> 3
     em.flags[avr.FlagV] = (v & 0x80) >> 7
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] &= b2i(x == 0)
+    andFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
@@ -159,7 +159,7 @@ func doADD(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagH] = (c & 0x08) >> 3
     em.flags[avr.FlagV] = (v & 0x80) >> 7
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
@@ -179,7 +179,7 @@ func doADIW(em *Emulator, word uint16) (cycles int) {
     // set flags
     em.flags[avr.FlagV] = uint8((^a & x & 0x8000) >> 15)
     em.flags[avr.FlagN] = uint8((x & 0x8000) >> 15)
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual16(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = uint8((^x & a & 0x8000) >> 15)
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
@@ -201,7 +201,7 @@ func doAND(em *Emulator, word uint16) (cycles int) {
     // set flags
     em.flags[avr.FlagV] = 0
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagS] = em.flags[avr.FlagN]
     // store result
     em.regs[d] = x
@@ -220,7 +220,7 @@ func doANDI(em *Emulator, word uint16) (cycles int) {
     // set flags
     em.flags[avr.FlagV] = 0
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagS] = em.flags[avr.FlagN]
     // store result
     em.regs[d] = x
@@ -237,7 +237,7 @@ func doASR(em *Emulator, word uint16) (cycles int) {
     x := uint8(int8(a) >> 1)
     // set flags
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = a & 0x01
     em.flags[avr.FlagV] = em.flags[avr.FlagN] ^ em.flags[avr.FlagC]
     em.flags[avr.FlagS] = em.flags[avr.FlagC]
@@ -348,7 +348,7 @@ func doCOM(em *Emulator, word uint16) (cycles int) {
     // set flags
     em.flags[avr.FlagV] = 0
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = 1
     em.flags[avr.FlagS] = em.flags[avr.FlagN]
     // store result
@@ -372,7 +372,7 @@ func doCP(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagH] = (c & 0x08) >> 3
     em.flags[avr.FlagV] = (v & 0x80) >> 7
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     return 1
@@ -394,7 +394,7 @@ func doCPC(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagH] = (c & 0x08) >> 3
     em.flags[avr.FlagV] = (v & 0x80) >> 7
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] &= b2i(x == 0)
+    andFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     return 1
@@ -415,7 +415,7 @@ func doCPI(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagH] = (c & 0x08) >> 3
     em.flags[avr.FlagV] = (v & 0x80) >> 7
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     return 1
@@ -445,9 +445,9 @@ func doDEC(em *Emulator, word uint16) (cycles int) {
     // compute result
     x := a - 1
     // set flags
-    em.flags[avr.FlagV] = b2i(a == 0x80)
+    setFlagIfEqual(&em.flags[avr.FlagV], a, 0x80)
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
     em.regs[d] = x
@@ -551,7 +551,7 @@ func doEOR(em *Emulator, word uint16) (cycles int) {
     // set flags
     em.flags[avr.FlagV] = 0
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagS] = em.flags[avr.FlagN]
     // store result
     em.regs[d] = x
@@ -569,7 +569,7 @@ func doFMUL(em *Emulator, word uint16) (cycles int) {
     // compute result
     x := uint16(a) * uint16(b)
     // set flags
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual16(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = uint8((x & 0x8000) >> 15)
     // perform corrective shift
     x = x << 1
@@ -590,7 +590,7 @@ func doFMULS(em *Emulator, word uint16) (cycles int) {
     // compute result
     x := uint16(int16(a) * int16(b))
     // set flags
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual16(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = uint8((x & 0x8000) >> 15)
     // perform corrective shift
     x = x << 1
@@ -611,7 +611,7 @@ func doFMULSU(em *Emulator, word uint16) (cycles int) {
     // compute result
     x := uint16(int16(a) * int16(b))
     // set flags
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual16(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = uint8((x & 0x8000) >> 15)
     // perform corrective shift
     x = x << 1
@@ -662,9 +662,9 @@ func doINC(em *Emulator, word uint16) (cycles int) {
     // compute result
     x := a - 1
     // set flags
-    em.flags[avr.FlagV] = b2i(a == 0x7F)
+    setFlagIfEqual(&em.flags[avr.FlagV], a, 0x7F)
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
     em.regs[d] = x
@@ -1010,7 +1010,7 @@ func doLSR(em *Emulator, word uint16) (cycles int) {
     x := uint8(int8(a) >> 1)
     // set flags
     em.flags[avr.FlagN] = 0
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = a & 0x01
     em.flags[avr.FlagV] = em.flags[avr.FlagN] ^ em.flags[avr.FlagC]
     em.flags[avr.FlagS] = em.flags[avr.FlagC]
@@ -1047,7 +1047,7 @@ func doMUL(em *Emulator, word uint16) (cycles int) {
     // compute result
     x := uint16(a) * uint16(b)
     // set flags
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual16(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = uint8((x & 0x8000) >> 15)
     // store result
     em.regs[1] = uint8(x >> 8)
@@ -1066,7 +1066,7 @@ func doMULS(em *Emulator, word uint16) (cycles int) {
     // compute result
     x := uint16(int16(a) * int16(b))
     // set flags
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual16(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = uint8((x & 0x8000) >> 15)
     // store result
     em.regs[1] = uint8(x >> 8)
@@ -1085,7 +1085,7 @@ func doMULSU(em *Emulator, word uint16) (cycles int) {
     // compute result
     x := uint16(int16(a) * int16(b))
     // set flags
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual16(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = uint8((x & 0x8000) >> 15)
     // store result
     em.regs[1] = uint8(x >> 8)
@@ -1103,10 +1103,10 @@ func doNEG(em *Emulator, word uint16) (cycles int) {
     x := -a
     // set flags
     em.flags[avr.FlagH] = ((a | x) & 0x08) >> 3
-    em.flags[avr.FlagV] = b2i(x == 0x80)
+    setFlagIfEqual(&em.flags[avr.FlagV], x, 0x80)
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
-    em.flags[avr.FlagC] = b2i(x != 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
+    em.flags[avr.FlagC] = 1 - em.flags[avr.FlagZ] // x != 0
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
     em.regs[d] = x
@@ -1131,7 +1131,7 @@ func doOR(em *Emulator, word uint16) (cycles int) {
     // set flags
     em.flags[avr.FlagV] = 0
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagS] = em.flags[avr.FlagN]
     // store result
     em.regs[d] = x
@@ -1150,7 +1150,7 @@ func doORI(em *Emulator, word uint16) (cycles int) {
     // set flags
     em.flags[avr.FlagV] = 0
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagS] = em.flags[avr.FlagN]
     // store result
     em.regs[d] = x
@@ -1257,7 +1257,7 @@ func doROR(em *Emulator, word uint16) (cycles int) {
     x := (a >> 1) | (em.flags[avr.FlagC] << 7)
     // set flags
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = a & 0x01
     em.flags[avr.FlagV] = em.flags[avr.FlagN] ^ em.flags[avr.FlagC]
     em.flags[avr.FlagS] = em.flags[avr.FlagC]
@@ -1282,7 +1282,7 @@ func doSBC(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagH] = (c & 0x08) >> 3
     em.flags[avr.FlagV] = (v & 0x80) >> 7
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] &= b2i(x == 0)
+    andFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
@@ -1305,7 +1305,7 @@ func doSBCI(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagH] = (c & 0x08) >> 3
     em.flags[avr.FlagV] = (v & 0x80) >> 7
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] &= b2i(x == 0)
+    andFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
@@ -1378,7 +1378,7 @@ func doSBIW(em *Emulator, word uint16) (cycles int) {
     // set flags
     em.flags[avr.FlagV] = uint8((a & ^x & 0x8000) >> 15)
     em.flags[avr.FlagN] = uint8((x & 0x8000) >> 15)
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual16(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = uint8((x & ^a & 0x8000) >> 15)
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
@@ -1612,7 +1612,7 @@ func doSUB(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagH] = (c & 0x08) >> 3
     em.flags[avr.FlagV] = (v & 0x80) >> 7
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result
@@ -1635,7 +1635,7 @@ func doSUBI(em *Emulator, word uint16) (cycles int) {
     em.flags[avr.FlagH] = (c & 0x08) >> 3
     em.flags[avr.FlagV] = (v & 0x80) >> 7
     em.flags[avr.FlagN] = (x & 0x80) >> 7
-    em.flags[avr.FlagZ] = b2i(x == 0)
+    setFlagIfEqual(&em.flags[avr.FlagZ], x, 0)
     em.flags[avr.FlagC] = (c & 0x80) >> 7
     em.flags[avr.FlagS] = em.flags[avr.FlagN] ^ em.flags[avr.FlagV]
     // store result

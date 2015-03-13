@@ -14,6 +14,28 @@ func b2i(x bool) uint8 {
     return 0
 }
 
+func setFlagIfEqual(dest *uint8, x, y uint8) {
+    if x == y {
+        *dest = 1
+    } else {
+        *dest = 0
+    }
+}
+
+func setFlagIfEqual16(dest *uint8, x, y uint16) {
+    if x == y {
+        *dest = 1
+    } else {
+        *dest = 0
+    }
+}
+
+func andFlagIfEqual(dest *uint8, x, y uint8) {
+    if x != y {
+        *dest = 0
+    }
+}
+
 // Warnings include events such as
 // * invalid instructions
 // * instructions not available on this particular MCU
