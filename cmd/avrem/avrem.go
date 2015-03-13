@@ -15,6 +15,7 @@ import (
 )
 
 var cpuProfile = flag.String("cpuprofile", "", "filename to write profiling data to")
+var throttleFreq = flag.Float64("freq", 0, "clock frequency to throttle emulation to (in MHz, 0 to run unthrottled)")
 
 func main() {
     flag.Parse()
@@ -50,23 +51,7 @@ func runEmulator() {
     loadProgram(em)
     setupIO(em, clk)
     
-    /*
-    // main loop
-    m := 20
-    n := 10000000 / m
-    for {
-        t1 := time.Now()
-        for i := 0; i < n; i++ {
-            em.Run(uint(m))
-            t0.Run(uint(m))
-            totalTicks += uint64(m)
-        }
-        t2 := time.Now()
-        
-        secs := float64(t2.Sub(t1)) / float64(time.Second)
-        fmt.Printf("Running at: %f MHz (%f ns/tick)\n", float64(n*m) / (secs * 1e6), (secs * 1e9) / float64(n*m))
-    }
-    */
+    throttleFreq_ := *throttleFreq
     
     for i := 0; i < 100; i++ {
         clk.LogFrequency()
@@ -75,7 +60,9 @@ func runEmulator() {
             clk.Run(20)
         }
         
-        clk.Throttle(16e6)
+        if throttleFreq_ != 0 {
+            clk.Throttle(throttleFreq_ * 1e6)
+        }
     }
     
     fmt.Println("OK.")
