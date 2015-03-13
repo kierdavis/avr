@@ -16,6 +16,18 @@ import (
 
 var cpuProfile = flag.String("cpuprofile", "", "filename to write profiling data to")
 var throttleFreq = flag.Float64("freq", 0, "clock frequency to throttle emulation to (in MHz, 0 to run unthrottled)")
+var mcu = flag.String("mcu", "mega168", "select specific MCU to use (use -mcus to list available MCU names)")
+var mcus = flag.Bool("mcus", false, "list MCU names")
+
+var mcuMap = map[string]*spec.MCUSpec{
+    "tiny4": spec.ATtiny4,
+    "tiny5": spec.ATtiny5,
+    "tiny9": spec.ATtiny9,
+    "tiny10": spec.ATtiny10,
+    "mega48": spec.ATmega48,
+    "mega88": spec.ATmega88,
+    "mega168": spec.ATmega168,
+}
 
 func main() {
     flag.Parse()
@@ -25,6 +37,14 @@ func main() {
         os.Exit(2)
     }
     
+    if *mcus {
+        fmt.Printf("MCUs available for use with -mcu:\n")
+        for name := range mcuMap {
+            fmt.Printf("  %s\n", name)
+        }
+        return
+    }
+
     if *cpuProfile != "" {
         f, err := os.Create(*cpuProfile)
         if err != nil {
@@ -42,9 +62,16 @@ func main() {
 }
 
 func runEmulator() {
+    spec, ok := mcuMap[*mcu]
+    if !ok {
+        fmt.Fprintf(os.Stderr, "error: invalid value for -mcu (try -mcus for a list)\n")
+        os.Exit(2)
+    }
+    log.Printf("[avr/cmd/avrem] using MCU spec: %s", spec.Label)
+
     clk := clock.New()
     
-    em := emulator.NewEmulator(spec.ATmega168)
+    em := emulator.NewEmulator(spec)
     em.SetLogging(true)
     clk.Add(em)
     
