@@ -17,6 +17,7 @@ To-do list
 * Optimise, optimise, optimise.
 * Remove dependency of timer, UART etc. on GPIO by creating a physical pin multiplexer module.
 * Take into account 16-register processors (since the 16 registers that are provided are actually regs 16-31).
+* Abstract MCU specs into a template-based DSL.
 
 ## Thoughts
 
