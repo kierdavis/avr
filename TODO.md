@@ -3,7 +3,6 @@ To-do list
 
 ## Short term
 
-* Implement timer/count hardware package.
 * Implement UART hardware package.
 
 ## Long term
