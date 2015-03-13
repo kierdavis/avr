@@ -69,8 +69,7 @@ func runEmulator() {
     */
     
     for i := 0; i < 100; i++ {
-        freq := clk.MonitorFrequency()
-        log.Printf("[avr/cmd/avrem] Running at: %.1f MHz (%.1f ns/tick)", freq / 1e6, 1e9 / freq)
+        clk.LogFrequency()
         
         for i := 0; i < 1e5; i++ {
             clk.Run(20)

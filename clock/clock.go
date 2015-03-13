@@ -1,6 +1,7 @@
 package clock
 
 import (
+    "log"
     "time"
 )
 
@@ -43,6 +44,11 @@ func (c *Clock) MonitorFrequency() (freq float64) {
     c.lastFreqCheck = now
     c.ticksSinceFreqCheck = 0
     return freq
+}
+
+func (c *Clock) LogFrequency() {
+    freq := c.MonitorFrequency()
+    log.Printf("[avr/clock] Running at: %.1f MHz (%.1f ns/tick)", freq / 1e6, 1e9 / freq)
 }
 
 func (c *Clock) Throttle(freq float64) {
