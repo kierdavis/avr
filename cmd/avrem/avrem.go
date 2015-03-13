@@ -117,11 +117,9 @@ func (a *PrintingOutputPinAdapter) SetState(state bool) {
     if state != a.Prev {
         a.Prev = state
         if state {
-            fmt.Printf("%s changed to high\n", a.Label)
+            log.Printf("[avr/cmd/avrem] %s changed to high", a.Label)
         } else {
-            fmt.Printf("%s changed to low\n", a.Label)
+            log.Printf("[avr/cmd/avrem] %s changed to low", a.Label)
         }
-    } else {
-        fmt.Printf("%s remained the same\n", a.Label)
     }
 }
