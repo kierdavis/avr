@@ -10,8 +10,10 @@ type Process interface {
 
 type Clock struct {
     procs []Process
-    t time.Time
-    ticks uint
+    lastFreqCheck time.Time
+    lastThrottle time.Time
+    ticksSinceFreqCheck uint
+    ticksSinceThrottle uint
 }
 
 func New() (c *Clock) {
@@ -26,18 +28,35 @@ func (c *Clock) Run(ticks uint) {
     for _, proc := range c.procs {
         proc.Run(ticks)
     }
-    c.ticks += ticks
+    c.ticksSinceFreqCheck += ticks
+    c.ticksSinceThrottle += ticks
 }
 
 func (c *Clock) MonitorFrequency() (freq float64) {
     now := time.Now()
-    if !c.t.IsZero() {
-        dur := now.Sub(c.t)
+    if !c.lastFreqCheck.IsZero() {
+        dur := now.Sub(c.lastFreqCheck)
         secs := float64(dur) / float64(time.Second)
-        freq = float64(c.ticks) / secs
+        freq = float64(c.ticksSinceFreqCheck) / secs
     }
     
-    c.t = now
-    c.ticks = 0
+    c.lastFreqCheck = now
+    c.ticksSinceFreqCheck = 0
     return freq
+}
+
+func (c *Clock) Throttle(freq float64) {
+    periodSecs := 1 / freq
+    period := time.Duration(periodSecs * float64(time.Second))
+    
+    if !c.lastThrottle.IsZero() {
+        targetTime := c.lastThrottle.Add(period * time.Duration(c.ticksSinceThrottle))
+        sleepDur := targetTime.Sub(time.Now())
+        if sleepDur > 0 {
+            time.Sleep(sleepDur)
+        }
+    }
+    
+    c.lastThrottle = time.Now()
+    c.ticksSinceThrottle = 0
 }
