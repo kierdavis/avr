@@ -71,11 +71,30 @@ func (t *Timer) OverrideOCPin(ocPinNum uint, gpioPinNum uint, g *gpio.GPIO) {
 // TODO: in PC-PWM mode, an OCRx bit may transition without a compare match for two reasons (see datasheet page 98)
 
 func (t *Timer) Run(ticks uint) {
+    var ticksIncr uint
+    
+    switch t.controlB & 0x07 {
+    case 0: // disabled
+        t.excessTicks = 0
+        return
+    case 1: // divider = 1
+        ticksIncr = 1
+    case 2: // divider = 8
+        ticksIncr = 8
+    case 3: // divider = 64
+        ticksIncr = 64
+    case 4: // divider = 256
+        ticksIncr = 256
+    case 5: // divider = 1024
+        ticksIncr = 1024
+    case 6, 7:
+        panic("(*Timer).Run: external clock sources not implemented")
+    }
     ticksExecuted := t.excessTicks
     
     for ticksExecuted < ticks {
         t.Tick()
-        ticksExecuted += 64
+        ticksExecuted += ticksIncr
     }
     
     t.excessTicks = ticksExecuted - ticks
