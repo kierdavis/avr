@@ -739,7 +739,7 @@ func DecodeLut(word uint16, reducedCore bool) avr.Instruction {
     }
 }
 
-var Decode = DecodeLut9Tree
+var Decode = DecodeLut
 
 // decoder lookup table for instructions whose high nibble is 9
 // reducedCore assumed to be false
