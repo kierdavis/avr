@@ -42,6 +42,11 @@ Running the "blink" example for a 16 MHz ATmega168:
 
     # avrem -mcu mega168 -freq 16 programs/blink/blink-atmega168.hex
 
+Note: currently, running the blink program (and probably other programs, when
+they are added) will produce about 20 "access of unmapped I/O port" warnings.
+This is simply due to the program initialising hardware subsystems that are not
+yet implemented in the emulator.
+
 ## Performance
 
 The maximum unthrottled clock rate approaches 35 MHz on my 2.3 GHz Intel i7
