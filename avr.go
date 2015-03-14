@@ -1,5 +1,7 @@
 package avr
 
+//go:generate stringer -type=Flag
+
 // A CPU status flag.
 type Flag int
 
