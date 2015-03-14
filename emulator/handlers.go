@@ -114,7 +114,7 @@ var handlers = [...]instHandler{
 }
 
 func init() {
-    if len(handlers) != int(avr.NumInstructions) {
+    if len(handlers) != avr.NumInstructions {
         panic("package avr/emulator: len(handlers) != avr.NumInstructions")
     }
 }

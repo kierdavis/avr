@@ -106,9 +106,9 @@ const (
     SWAP
     WDR
     XCH
-    
-    NumInstructions
 )
+
+const NumInstructions = int(XCH) + 1
 
 var instStrings = [...]string{
     "ADC",
@@ -217,13 +217,13 @@ var instStrings = [...]string{
 }
 
 func init() {
-    if len(instStrings) != int(NumInstructions) {
+    if len(instStrings) != NumInstructions {
         panic("package avr: len(instStrings) != NumInstructions")
     }
 }
 
 func (inst Instruction) String() string {
-    if inst >= 0 && inst < NumInstructions {
+    if inst >= 0 && int(inst) < NumInstructions {
         return instStrings[inst]
     }
     return "<invalid>"
