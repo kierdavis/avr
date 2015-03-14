@@ -46,7 +46,7 @@ Running the "blink" example for a 16 MHz ATmega168:
 
 The maximum unthrottled clock rate approaches 35 MHz on my 2.3 GHz Intel i7
 processor. Real AVR microprocessors range from 1 to 20 MHz, so this software can
-theoretically simulate an mid-range AVR processor twice as quickly as the
+in theory simulate an mid-range AVR processor almost twice as quickly as the
 physical implementation.
 
 ## Packages
