@@ -231,7 +231,7 @@ func (inst Instruction) String() string {
 
 func (inst Instruction) IsTwoWord() bool {
     switch inst {
-    case CALL, JMP:
+    case CALL, JMP, LDS, STS:
         return true
     default:
         return false
