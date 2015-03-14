@@ -34,6 +34,14 @@ Flags include `-mcu` to specify the name of the MCU spec to use, `-mcus` to list
 the names of all available MCU specs, and `-freq` to specify the execution
 frequency.
 
+The "programs" subdirectory contains example programs. Many of these are
+[Arduino][arduino] programs, and have precompiled IHEX program files for a
+number of MCUs present in the same directory.
+
+Running the "blink" example for a 16 MHz ATmega168:
+
+    # avrem -mcu mega168 -freq 16 programs/blink/blink-atmega168.hex
+
 ## Performance
 
 The maximum unthrottled clock rate approaches 35 MHz on my 2.3 GHz Intel i7
