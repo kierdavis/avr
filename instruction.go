@@ -1,6 +1,7 @@
 package avr
 
 //go:generate stringer -type=Instruction
+
 type Instruction int
 
 const (
