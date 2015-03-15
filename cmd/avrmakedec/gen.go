@@ -17,6 +17,10 @@ const (
     // A lookup table computed at compile-time. Results in a large executable
     // size (adds an extra megabyte), but is exceedingly fast at runtime.
     Lutc
+    // A lookup table computed at runtime using a Flat decoder during startup.
+    // As fast as Lutc during usage of Decode, but increases program loading
+    // time.
+    Lutr
 )
 
 type Generator struct {
@@ -37,6 +41,8 @@ func (g *Generator) Generate(pkgName string, kind Kind) {
         g.GenerateFlat()
     case Lutc:
         g.GenerateLutc()
+    case Lutr:
+        g.GenerateLutr()
     default:
         panic("Generator.Generate: bad Kind")
     }

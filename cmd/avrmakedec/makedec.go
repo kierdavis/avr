@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	FlagKind = flag.String("kind", "flat", "the kind of decoder to create (choices: 'flat' (single switch block), 'lutc' (lookup table initialised at compile time))")
+	FlagKind = flag.String("kind", "flat", "the kind of decoder to create (choices: 'flat' (single switch block), 'lutc' (lookup table initialised at compile time), 'lutr' (lookup table initialised at runtime))")
 	FlagPkg = flag.String("pkg", "", "the package name to use for the generated file")
 	FlagOutput = flag.String("output", "decoder.go", "the file to write output to")
 )
@@ -28,6 +28,8 @@ func main() {
 		kind = Flat
 	case "lutc":
 		kind = Lutc
+	case "lutr":
+		kind = Lutr
 	default:
 		log.Printf("error: bad value for -kind: %s (expected one of 'flat')", *FlagKind)
 		os.Exit(2)
