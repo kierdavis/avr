@@ -146,13 +146,13 @@ func (t *Timer) Tick() {
     if t.em != nil && t.em.InterruptsEnabled() {
         intName := ""
         if t.interruptFlags & 0x01 != 0 && t.interruptMask & 0x01 != 0 {
-            t.interruptFlags &= 0xFE // clear flag
+            t.interruptFlags &= 0xFE
             intName = fmt.Sprintf("TIMER%d_OVF", t.digit)
         } else if t.interruptFlags & 0x02 != 0 && t.interruptMask & 0x02 != 0 {
-            t.interruptFlags &= 0xFD // clear flag
+            t.interruptFlags &= 0xFD
             intName = fmt.Sprintf("TIMER%d_COMPA", t.digit)
         } else if t.interruptFlags & 0x04 != 0 && t.interruptMask & 0x04 != 0 {
-            t.interruptFlags &= 0xFB // clear flag
+            t.interruptFlags &= 0xFB
             intName = fmt.Sprintf("TIMER%d_COMPB", t.digit)
         }
         
@@ -343,13 +343,13 @@ func (t *Timer) updateOCPin(ocPinNum uint) {
 // Set an output compare match (OCFy) flag.
 func (t *Timer) setOCF(ocPinNum uint) {
     if ocPinNum == 0 { // A
-        t.interruptFlags |= 0x02 // set flag
+        t.interruptFlags |= 0x02
     } else { // B
-        t.interruptFlags |= 0x04 // set flag
+        t.interruptFlags |= 0x04
     }
 }
 
 // Set the timer overflow (TOV) flag.
 func (t *Timer) setTOV() {
-    t.interruptFlags |= 0x01 // set flag
+    t.interruptFlags |= 0x01
 }
