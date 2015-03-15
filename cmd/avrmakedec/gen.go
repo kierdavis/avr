@@ -13,6 +13,7 @@ type Kind int
 
 const (
     Flat Kind = iota
+    Lutc
 )
 
 type Generator struct {
@@ -31,6 +32,8 @@ func (g *Generator) Generate(pkgName string, kind Kind) {
     switch kind {
     case Flat:
         g.GenerateFlat()
+    case Lutc:
+        g.GenerateLutc()
     default:
         panic("Generator.Generate: bad Kind")
     }

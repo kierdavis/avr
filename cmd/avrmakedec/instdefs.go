@@ -124,3 +124,20 @@ var InstDefs = []InstDef{
 	InstDef{avr.WDR,       0xFFFF, 0x95A8, Either},
 	InstDef{avr.XCH,       0xFE0F, 0x9204, Either},
 }
+
+func Decode(word uint16, reducedCore bool) (inst avr.Instruction) {
+	var r RCMode
+	if reducedCore {
+		r = RC
+	} else {
+		r = NotRC
+	}
+	
+	for _, instDef := range InstDefs {
+		if word & instDef.Mask == instDef.Match && (instDef.RCMode == r || instDef.RCMode == Either) {
+			return instDef.Inst
+		}
+	}
+	
+	return -1
+}
