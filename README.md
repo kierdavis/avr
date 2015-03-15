@@ -63,3 +63,9 @@ physical implementation.
 * `github.com/kierdavis/avr/hardware/timer` - implementation of timer/counter module
 * `github.com/kierdavis/avr/loader/ihexloader` - links Intel HEX file parser with loading programs into emulators
 * `github.com/kierdavis/avr/spec` - specifications of the many different models of AVR processor (MCUs)
+
+## License
+
+This source code is distributed under the [MIT][license] license.
+
+[license]: https://github.com/kierdavis/avr/blob/master/LICENSE
