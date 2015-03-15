@@ -338,6 +338,18 @@ func (t *Timer) checkOCPinFastPWMMode(ocPinNum uint, compareVal uint8) {
     }
 }
 
+// Force an output compare by calling the appropriate changeOCPin method.
+func (t *Timer) forceOutputCompare(ocPinNum uint) {
+    switch t.getWGM() {
+    case 0: // Normal
+        t.changeOCPinNormalMode(ocPinNum)
+    case 2: // Clear timer on compare
+        t.changeOCPinCTCMode(ocPinNum)
+    default:
+        // Force output compare has no effect in non-PWM modes.
+    }
+}
+
 // Toggle an output-compare pin.
 func (t *Timer) toggleOCPin(ocPinNum uint) {
     t.ocPinStates[ocPinNum] = !t.ocPinStates[ocPinNum]

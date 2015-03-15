@@ -23,7 +23,14 @@ func (p tccrb) Read() uint8 {
 }
 
 func (p tccrb) Write(x uint8) {
-    p.t.controlB = x
+    if x & 0x80 != 0 {
+        p.t.forceOutputCompare(0)
+    }
+    if x & 0x40 != 0 {
+        p.t.forceOutputCompare(1)
+    }
+    
+    p.t.controlB = x & 0x3F
 }
 
 // Implementation of TCNTx port
