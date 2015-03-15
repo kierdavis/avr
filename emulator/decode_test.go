@@ -234,8 +234,16 @@ func BenchmarkDecode951d(b *testing.B) {
 }
 */
 
+func BenchmarkBaselineRandom(b *testing.B) {
+    x := uint16(0xabcd)
+    for i := 0; i < b.N; i++ {
+        x ^= x << 13
+        x ^= x >> 9
+        x ^= x << 7
+    }
+}
+
 func BenchmarkDecodeRandom(b *testing.B) {
-    // implement an xorshift RNG for speed
     x := uint16(0xabcd)
     for i := 0; i < b.N; i++ {
         x ^= x << 13
