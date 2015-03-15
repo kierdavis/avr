@@ -103,9 +103,7 @@ func (t *Timer) Run(ticks uint) {
 // Tick the timer.
 func (t *Timer) Tick() {
     // Get the waveform generation mode bits
-    wgmA := t.controlA & 0x03 // bits 1 and 0
-    wgmB := (t.controlB & 0x08) >> 1 // bit 3 (shifted to bit 2)
-    wgm := wgmB | wgmA
+    wgm := t.getWGM()
     
     // Handle match-compare interrupts
     if t.inhibitCompareMatch {
@@ -382,4 +380,10 @@ func (t *Timer) setOCF(ocPinNum uint) {
 // Set the timer overflow (TOV) flag.
 func (t *Timer) setTOV() {
     t.interruptFlags |= 0x01
+}
+
+func (t *Timer) getWGM() (wgm uint8) {
+    wgmA := t.controlA & 0x03 // bits 1 and 0
+    wgmB := (t.controlB & 0x08) >> 1 // bit 3 (shifted to bit 2)
+    return wgmB | wgmA
 }
