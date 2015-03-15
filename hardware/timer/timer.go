@@ -389,6 +389,7 @@ func (t *Timer) setTOV() {
     t.interruptFlags |= 0x01
 }
 
+// Get the WGM (waveform generation mode) bits
 func (t *Timer) getWGM() (wgm uint8) {
     wgmA := t.controlA & 0x03 // bits 1 and 0
     wgmB := (t.controlB & 0x08) >> 1 // bit 3 (shifted to bit 2)
