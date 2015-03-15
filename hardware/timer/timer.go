@@ -1,7 +1,8 @@
 // Package gpio implements a timer/counter unit.
 // Tested compatibility:
-//   ATmega48/88/168
+//   ATmega48/88/168 (timer 0 only)
 // Untested compatability:
+//   ATmega48/88/168 (timers 1 and 2)
 //   ATtiny4/5/9/10
 package timer
 
