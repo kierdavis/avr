@@ -2,7 +2,7 @@ package avr
 
 //go:generate stringer -type=Instruction
 
-type Instruction int
+type Instruction int8
 
 const (
     ADC Instruction = iota
