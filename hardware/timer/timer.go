@@ -259,6 +259,32 @@ func (t *Timer) tickCTCMode() {
         // this tick should set counter to 0
         t.count = 0xFF
     }
+    
+    t.checkOCPinCTCMode(0, t.compareValA)
+    t.checkOCPinCTCMode(1, t.compareValB)
+}
+
+// Check for output-compare in normal mode.
+func (t *Timer) checkOCPinCTCMode(ocPinNum uint, compareVal uint8) {
+    if t.count == compareVal {
+        t.changeOCPinCTCMode(ocPinNum)
+    }
+}
+
+func (t *Timer) changeOCPinCTCMode(ocPinNum uint) {
+    // Get COMxy bits
+    shiftAmt := 6 - 2*ocPinNum // 0 => 6, 1 => 4
+    com := (t.controlA >> shiftAmt) & 0x03
+    switch com {
+    case 0: // OCy disabled
+        // do nothing
+    case 1: // toggle OCy
+        t.toggleOCPin(ocPinNum)
+    case 2: // clear OCy
+        t.clearOCPin(ocPinNum)
+    case 3: // set OCy
+        t.setOCPin(ocPinNum)
+    }
 }
 
 // Tick the timer in fast PWM mode.
