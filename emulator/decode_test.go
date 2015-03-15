@@ -217,47 +217,11 @@ var decodeTests = []decodeTest{
     // depending on the status of the reducedCore flag.
 }
 
-func TestDecodeFull(t *testing.T) {
+func TestDecode(t *testing.T) {
     for _, test := range decodeTests {
-        inst := DecodeFull(test.word, test.reducedCore)
+        inst := Decode(test.word, test.reducedCore)
         if inst != test.inst {
-            t.Errorf("DecodeFull(0x%04x): expected '%s', got '%s'", test.word, test.inst, inst)
-        }
-    }
-}
-
-func TestDecodeTree(t *testing.T) {
-    for _, test := range decodeTests {
-        inst := DecodeTree(test.word, test.reducedCore)
-        if inst != test.inst {
-            t.Errorf("DecodeTree(0x%04x): expected '%s', got '%s'", test.word, test.inst, inst)
-        }
-    }
-}
-
-func TestDecodeLut9(t *testing.T) {
-    for _, test := range decodeTests {
-        inst := DecodeLut9(test.word, test.reducedCore)
-        if inst != test.inst {
-            t.Errorf("DecodeLut9(0x%04x): expected '%s', got '%s'", test.word, test.inst, inst)
-        }
-    }
-}
-
-func TestDecodeLut9Tree(t *testing.T) {
-    for _, test := range decodeTests {
-        inst := DecodeLut9Tree(test.word, test.reducedCore)
-        if inst != test.inst {
-            t.Errorf("DecodeLut9Tree(0x%04x): expected '%s', got '%s'", test.word, test.inst, inst)
-        }
-    }
-}
-
-func TestDecodeLut(t *testing.T) {
-    for _, test := range decodeTests {
-        inst := DecodeLut(test.word, test.reducedCore)
-        if inst != test.inst {
-            t.Errorf("DecodeLut(0x%04x): expected '%s', got '%s'", test.word, test.inst, inst)
+            t.Errorf("Decode(0x%04x): expected '%s', got '%s'", test.word, test.inst, inst)
         }
     }
 }
@@ -270,57 +234,13 @@ func BenchmarkDecode951d(b *testing.B) {
 }
 */
 
-func BenchmarkDecodeFullRandom(b *testing.B) {
+func BenchmarkDecodeRandom(b *testing.B) {
     // implement an xorshift RNG for speed
     x := uint16(0xabcd)
     for i := 0; i < b.N; i++ {
         x ^= x << 13
         x ^= x >> 9
         x ^= x << 7
-        DecodeFull(x, false)
-    }
-}
-
-func BenchmarkDecodeTreeRandom(b *testing.B) {
-    // implement an xorshift RNG for speed
-    x := uint16(0xabcd)
-    for i := 0; i < b.N; i++ {
-        x ^= x << 13
-        x ^= x >> 9
-        x ^= x << 7
-        DecodeTree(x, false)
-    }
-}
-
-func BenchmarkDecodeLut9Random(b *testing.B) {
-    // implement an xorshift RNG for speed
-    x := uint16(0xabcd)
-    for i := 0; i < b.N; i++ {
-        x ^= x << 13
-        x ^= x >> 9
-        x ^= x << 7
-        DecodeLut9(x, false)
-    }
-}
-
-func BenchmarkDecodeLut9TreeRandom(b *testing.B) {
-    // implement an xorshift RNG for speed
-    x := uint16(0xabcd)
-    for i := 0; i < b.N; i++ {
-        x ^= x << 13
-        x ^= x >> 9
-        x ^= x << 7
-        DecodeLut9Tree(x, false)
-    }
-}
-
-func BenchmarkDecodeLutRandom(b *testing.B) {
-    // implement an xorshift RNG for speed
-    x := uint16(0xabcd)
-    for i := 0; i < b.N; i++ {
-        x ^= x << 13
-        x ^= x >> 9
-        x ^= x << 7
-        DecodeLut(x, false)
+        Decode(x, false)
     }
 }
