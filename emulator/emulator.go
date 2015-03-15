@@ -118,11 +118,16 @@ func (em *Emulator) Run(ticks uint) {
     // subtract ticks that were executed on the last call to Run
     ticksExecuted := em.excessTicks
     
-    reducedCore := em.Spec.Family == spec.ReducedCore
+    var decodeFunc func(uint16) avr.Instruction
+    if em.Spec.Family == spec.ReducedCore {
+        decodeFunc = DecodeRC
+    } else {
+        decodeFunc = DecodeNonRC
+    }
     
     for ticksExecuted < ticks {
         word := em.fetchProgWord()
-        inst := Decode(word, reducedCore)
+        inst := decodeFunc(word)
         if inst < 0 {
             em.warn(InvalidInstructionWarning{em.pc - 1, word})
             ticksExecuted++
@@ -240,7 +245,14 @@ func (em *Emulator) writePort(bankNum uint, index uint16, val uint8) {
 // words were skipped.
 func (em *Emulator) skip() (cycles uint) {
     word := em.fetchProgWord()
-    inst := Decode(word, em.Spec.Family == spec.ReducedCore)
+    var inst avr.Instruction
+    
+    if em.Spec.Family == spec.ReducedCore {
+        inst = DecodeRC(word)
+    } else {
+        inst = DecodeNonRC(word)
+    }
+    
     if inst.IsTwoWord() {
         em.fetchProgWord()
         return 2

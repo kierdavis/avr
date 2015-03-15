@@ -219,7 +219,12 @@ var decodeTests = []decodeTest{
 
 func TestDecode(t *testing.T) {
     for _, test := range decodeTests {
-        inst := Decode(test.word, test.reducedCore)
+        var inst avr.Instruction
+        if test.reducedCore {
+            inst = DecodeRC(test.word)
+        } else {
+            inst = DecodeNonRC(test.word)
+        }
         if inst != test.inst {
             t.Errorf("Decode(0x%04x): expected '%s', got '%s'", test.word, test.inst, inst)
         }
@@ -249,6 +254,6 @@ func BenchmarkDecodeRandom(b *testing.B) {
         x ^= x << 13
         x ^= x >> 9
         x ^= x << 7
-        Decode(x, false)
+        DecodeNonRC(x)
     }
 }
