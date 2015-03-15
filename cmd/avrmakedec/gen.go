@@ -28,14 +28,12 @@ func (g *Generator) Generate(pkgName string, kind Kind) {
     g.Printf("// DO NOT EDIT\n")
     g.Printf("package %s\n", pkgName)
     g.Printf("import \"github.com/kierdavis/avr\"\n")
-    g.Printf("func Decode(word uint16, reducedCore bool) avr.Instruction {\n")
     switch kind {
     case Flat:
         g.GenerateFlat()
     default:
         panic("Generator.Generate: bad Kind")
     }
-    g.Printf("}\n")
 }
 
 func (g *Generator) Format() []byte {

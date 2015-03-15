@@ -1,6 +1,7 @@
 package main
 
 func (g *Generator) GenerateFlat() {
+    g.Printf("func Decode(word uint16, reducedCore bool) avr.Instruction {\n")
     g.Printf("  switch {\n")
     for _, instDef := range InstDefs {
         var format string
@@ -17,4 +18,5 @@ func (g *Generator) GenerateFlat() {
     }
     g.Printf("  }\n")
     g.Printf("  return -1\n")
+    g.Printf("}\n")
 }
