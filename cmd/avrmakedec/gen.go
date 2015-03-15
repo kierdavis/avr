@@ -12,7 +12,10 @@ import (
 type Kind int
 
 const (
+    // A single switch block. Simple, but slow.
     Flat Kind = iota
+    // A lookup table computed at compile-time. Results in a large executable
+    // size (adds an extra megabyte), but is exceedingly fast at runtime.
     Lutc
 )
 
