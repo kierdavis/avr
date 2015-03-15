@@ -14,8 +14,6 @@ import (
 
 // TODO: for a OSCx output, require corresponding DDR bit to be set to output
 
-// TODO: writing to TCNT prevents a compare match on the next clock
-
 // TODO: thread-safety!!
 
 // TODO: OCFy/TOV flags should not be cleared upon interrupt execution if the
@@ -35,6 +33,7 @@ type Timer struct {
     ocPinStates [2]bool
     ocPinCallbacks [2]func(bool)
     logging bool
+    inhibitCompareMatch bool // set when TCNT is written to prevent a compare match on the next clock
     excessTicks uint
 }
 
@@ -108,11 +107,15 @@ func (t *Timer) Tick() {
     wgm := wgmB | wgmA
     
     // Handle match-compare interrupts
-    if t.count == t.compareValA {
-        t.setOCF(0)
-    }
-    if t.count == t.compareValB {
-        t.setOCF(1)
+    if t.inhibitCompareMatch {
+        t.inhibitCompareMatch = false
+    } else {
+        if t.count == t.compareValA {
+            t.setOCF(0)
+        }
+        if t.count == t.compareValB {
+            t.setOCF(1)
+        }
     }
     
     // Prepare to tick counter

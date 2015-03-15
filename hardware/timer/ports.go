@@ -37,6 +37,9 @@ func (p tcnt) Read() uint8 {
 
 func (p tcnt) Write(x uint8) {
     p.t.count = x
+    
+    // Inhibit a compare match on the next clock
+    p.t.inhibitCompareMatch = true
 }
 
 // Implementation of OCRxA port
