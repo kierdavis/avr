@@ -179,19 +179,23 @@ func (t *Timer) tickNormalMode() {
 // Check for output-compare in normal mode.
 func (t *Timer) checkOCPinNormalMode(ocPinNum uint, compareVal uint8) {
     if t.count == compareVal {
-        // Get COMxy bits
-        shiftAmt := 6 - 2*ocPinNum // 0 => 6, 1 => 4
-        com := (t.controlA >> shiftAmt) & 0x03
-        switch com {
-        case 0: // OCy disabled
-            // do nothing
-        case 1: // toggle OCy
-            t.toggleOCPin(ocPinNum)
-        case 2: // clear OCy
-            t.clearOCPin(ocPinNum)
-        case 3: // set OCy
-            t.setOCPin(ocPinNum)
-        }
+        t.changeOCPinNormalMode(ocPinNum)
+    }
+}
+
+func (t *Timer) changeOCPinNormalMode(ocPinNum uint) {
+    // Get COMxy bits
+    shiftAmt := 6 - 2*ocPinNum // 0 => 6, 1 => 4
+    com := (t.controlA >> shiftAmt) & 0x03
+    switch com {
+    case 0: // OCy disabled
+        // do nothing
+    case 1: // toggle OCy
+        t.toggleOCPin(ocPinNum)
+    case 2: // clear OCy
+        t.clearOCPin(ocPinNum)
+    case 3: // set OCy
+        t.setOCPin(ocPinNum)
     }
 }
 
