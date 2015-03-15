@@ -183,8 +183,7 @@ func (t *Timer) checkOCPinNormalMode(ocPinNum uint, compareVal uint8) {
 
 func (t *Timer) changeOCPinNormalMode(ocPinNum uint) {
     // Get COMxy bits
-    shiftAmt := 6 - 2*ocPinNum // 0 => 6, 1 => 4
-    com := (t.controlA >> shiftAmt) & 0x03
+    com := t.getCOM(ocPinNum)
     switch com {
     case 0: // OCy disabled
         // do nothing
@@ -220,8 +219,7 @@ func (t *Timer) tickPCPWMMode(top uint8) {
 func (t *Timer) checkOCPinPCPWMMode(ocPinNum uint, compareVal uint8) {
     if t.count == compareVal {
         // Get COMxy bits
-        shiftAmt := 6 - 2*ocPinNum // 0 => 6, 1 => 4
-        com := (t.controlA >> shiftAmt) & 0x03
+        com := t.getCOM(ocPinNum)
         switch com {
         case 0: // OCy disabled
             // do nothing
@@ -271,8 +269,7 @@ func (t *Timer) checkOCPinCTCMode(ocPinNum uint, compareVal uint8) {
 
 func (t *Timer) changeOCPinCTCMode(ocPinNum uint) {
     // Get COMxy bits
-    shiftAmt := 6 - 2*ocPinNum // 0 => 6, 1 => 4
-    com := (t.controlA >> shiftAmt) & 0x03
+    com := t.getCOM(ocPinNum)
     switch com {
     case 0: // OCy disabled
         // do nothing
@@ -304,8 +301,7 @@ func (t *Timer) checkOCPinFastPWMMode(ocPinNum uint, compareVal uint8) {
     // BOTTOM
     if t.count == 0x00 {
         // Get COMxy bits
-        shiftAmt := 6 - 2*ocPinNum // 0 => 6, 1 => 4
-        com := (t.controlA >> shiftAmt) & 0x03
+        com := t.getCOM(ocPinNum)
         switch com {
         case 0: // OCy disabled
             // do nothing
@@ -321,8 +317,7 @@ func (t *Timer) checkOCPinFastPWMMode(ocPinNum uint, compareVal uint8) {
     // Compare match
     if t.count == compareVal {
         // Get COMxy bits
-        shiftAmt := 6 - 2*ocPinNum // 0 => 6, 1 => 4
-        com := (t.controlA >> shiftAmt) & 0x03
+        com := t.getCOM(ocPinNum)
         switch com {
         case 0: // OCy disabled
             // do nothing
@@ -398,4 +393,10 @@ func (t *Timer) getWGM() (wgm uint8) {
     wgmA := t.controlA & 0x03 // bits 1 and 0
     wgmB := (t.controlB & 0x08) >> 1 // bit 3 (shifted to bit 2)
     return wgmB | wgmA
+}
+
+// Get the COM (compare output mode) bits for a given OC pin number.
+func (t *Timer) getCOM(ocPinNum uint) (com uint8) {
+    shiftAmt := 6 - 2*ocPinNum // 0 => 6, 1 => 4
+    return (t.controlA >> shiftAmt) & 0x03
 }
