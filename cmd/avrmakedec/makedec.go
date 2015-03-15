@@ -14,6 +14,7 @@ import (
 var (
 	FlagKind = flag.String("kind", "flat", "the kind of decoder to create (choices: 'flat')")
 	FlagPkg = flag.String("pkg", "", "the package name to use for the generated file")
+	FlagOutput = flag.String("output", "decoder.go", "the file to write output to")
 )
 
 func main() {
@@ -37,5 +38,17 @@ func main() {
 	
 	var g Generator
 	g.Generate(*FlagPkg, kind)
-	fmt.Print(string(g.Format()))
+	
+	filename := *FlagOutput
+	log.Printf("writing %s", filename)
+	
+	f, err := os.Create(filename)
+	if err != nil {
+		log.Printf("error: could not open %s for writing: %s", filename, err)
+		os.Exit(1)
+	}
+	
+	src := string(g.Format())
+	fmt.Fprint(f, src)
+	f.Close()
 }
