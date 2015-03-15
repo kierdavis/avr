@@ -6,6 +6,7 @@ import (
     "go/format"
     "log"
     "os"
+    "strings"
 )
 
 type Kind int
