@@ -99,7 +99,6 @@ func (em *Emulator) InterruptsEnabled() bool {
 
 func (em *Emulator) Interrupt(num uint) {
     if em.InterruptsEnabled() {
-        //log.Printf("int %d (mem = $%02x $%02x $%02x $%02x)", num, em.loadDataByte(0x0106), em.loadDataByte(0x0107), em.loadDataByte(0x0108), em.loadDataByte(0x0109))
         em.flags[avr.FlagI] = 0
         em.pushPC()
         em.pc = uint32(num * em.Spec.InterruptVectorSize)

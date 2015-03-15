@@ -159,12 +159,6 @@ func (t *Timer) Tick() {
             }
         }
     }
-    
-    /*
-    if t.logging {
-        log.Printf("[avr/hardware/timer:(*Timer).tick] ticked, count is now $%02X", t.count)
-    }
-    */
 }
 
 // Tick the timer in Normal mode.
