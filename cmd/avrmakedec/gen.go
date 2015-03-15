@@ -4,7 +4,7 @@ import (
     "bytes"
     "fmt"
     "go/format"
-    "os"
+    "log"
 )
 
 type Kind int
@@ -37,8 +37,8 @@ func (g *Generator) Generate(pkgName string, kind Kind) {
 func (g *Generator) Format() []byte {
     src, err := format.Source(g.buf.Bytes())
     if err != nil {
-        fmt.Fprintf(os.Stderr, "warning: invalid Go generated: %s\n", err)
-        fmt.Fprintf(os.Stderr, "warning: compile the package to analyse the error\n")
+        log.Printf("warning: invalid Go generated: %s\n", err)
+        log.Printf("warning: compile the package to analyse the error\n")
         return g.buf.Bytes()
     }
     return src
