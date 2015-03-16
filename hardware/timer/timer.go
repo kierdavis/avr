@@ -13,13 +13,6 @@ import (
     "log"
 )
 
-// TODO: for a OSCx output, require corresponding DDR bit to be set to output
-
-// TODO: thread-safety!!
-
-// TODO: OCFy/TOV flags should not be cleared upon interrupt execution if the
-// emulator's global interrupt enable flag is cleared
-
 type Timer struct {
     em *emulator.Emulator
     digit uint
@@ -67,8 +60,6 @@ func (t *Timer) OverrideOCPin(ocPinNum uint, gpioPinNum uint, g *gpio.GPIO) {
 }
 
 // Note: in PWM modes, OCRA/OCRB do not exhibit a newly written value until the count overflows
-
-// TODO: in PC-PWM mode, an OCRx bit may transition without a compare match for two reasons (see datasheet page 98)
 
 func (t *Timer) Run(ticks uint) {
     var ticksIncr uint
@@ -208,8 +199,6 @@ func (t *Timer) tickPCPWMMode(top uint8) {
     t.checkOCPinPCPWMMode(0, t.compareValA)
     t.checkOCPinPCPWMMode(1, t.compareValB)
 }
-
-// TODO: there is a special case in the OC pin checking for both PWM modes when OCRy == TOP and COMxy1 is set (see datasheet page 101)
 
 // Check for output-compare in phase-corrected PWM mode.
 func (t *Timer) checkOCPinPCPWMMode(ocPinNum uint, compareVal uint8) {
