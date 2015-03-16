@@ -12,7 +12,7 @@ import (
 func Load(em *emulator.Emulator, r io.Reader) (err error) {
     dec := ihex.NewDecoder(r)
     buf := make([]uint16, 0, 8)
-    
+
     for dec.Scan() {
         rec := dec.Record()
         if rec.Type == ihex.Data {
@@ -20,12 +20,12 @@ func Load(em *emulator.Emulator, r io.Reader) (err error) {
             for i := 0; i+1 < len(rec.Data); i += 2 {
                 lo := uint16(rec.Data[i])
                 hi := uint16(rec.Data[i+1])
-                buf = append(buf, (hi << 8) | lo)
+                buf = append(buf, (hi<<8)|lo)
             }
-            
-            em.WriteProg(rec.Address >> 1, buf)
+
+            em.WriteProg(rec.Address>>1, buf)
         }
     }
-    
+
     return dec.Err()
 }

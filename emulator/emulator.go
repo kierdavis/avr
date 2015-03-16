@@ -30,15 +30,15 @@ type Emulator struct {
 // NewEmulator creates and returns an initialised Emulator for the given MCUSpec.
 func NewEmulator(mcuSpec *spec.MCUSpec) (em *Emulator) {
     em = &Emulator{
-        Spec:        mcuSpec,
-        regions:     make([]Region, len(mcuSpec.Regions)),
-        ports:       make([][]Port, len(mcuSpec.IOBankSizes)),
-        prog:        make([]uint16, 1<<mcuSpec.LogProgMemSize),
-        ram:         make([]uint8, 1<<mcuSpec.LogRAMSize),
-        pc:          0,
-        pcmask:      (1 << mcuSpec.LogProgMemSize) - 1,
+        Spec:    mcuSpec,
+        regions: make([]Region, len(mcuSpec.Regions)),
+        ports:   make([][]Port, len(mcuSpec.IOBankSizes)),
+        prog:    make([]uint16, 1<<mcuSpec.LogProgMemSize),
+        ram:     make([]uint8, 1<<mcuSpec.LogRAMSize),
+        pc:      0,
+        pcmask:  (1 << mcuSpec.LogProgMemSize) - 1,
     }
-    
+
     for i := range em.ports {
         em.ports[i] = make([]Port, mcuSpec.IOBankSizes[i])
     }
@@ -117,14 +117,14 @@ func (em *Emulator) InterruptByName(name string) (ok bool) {
 func (em *Emulator) Run(ticks uint) {
     // subtract ticks that were executed on the last call to Run
     ticksExecuted := em.excessTicks
-    
+
     var decodeFunc func(uint16) avr.Instruction
     if em.Spec.Family == spec.ReducedCore {
         decodeFunc = DecodeRC
     } else {
         decodeFunc = DecodeNonRC
     }
-    
+
     for ticksExecuted < ticks {
         word := em.fetchProgWord()
         inst := decodeFunc(word)
@@ -133,7 +133,7 @@ func (em *Emulator) Run(ticks uint) {
             ticksExecuted++
             continue
         }
-        
+
         if !em.Spec.Available[inst] {
             em.warn(UnavailableInstructionWarning{em.pc - 1, inst, em.Spec})
             ticksExecuted++
@@ -143,7 +143,7 @@ func (em *Emulator) Run(ticks uint) {
         handler := handlers[inst]
         ticksExecuted += handler(em, word)
     }
-    
+
     em.excessTicks = ticksExecuted - ticks
 }
 
@@ -170,7 +170,7 @@ func (em *Emulator) demap(addr uint16) (r Region) {
             return r
         }
     }
-    
+
     return nil
 }
 
@@ -246,13 +246,13 @@ func (em *Emulator) writePort(bankNum uint, index uint16, val uint8) {
 func (em *Emulator) skip() (cycles uint) {
     word := em.fetchProgWord()
     var inst avr.Instruction
-    
+
     if em.Spec.Family == spec.ReducedCore {
         inst = DecodeRC(word)
     } else {
         inst = DecodeNonRC(word)
     }
-    
+
     if inst.IsTwoWord() {
         em.fetchProgWord()
         return 2

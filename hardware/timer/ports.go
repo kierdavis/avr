@@ -23,13 +23,13 @@ func (p tccrb) Read() uint8 {
 }
 
 func (p tccrb) Write(x uint8) {
-    if x & 0x80 != 0 {
+    if x&0x80 != 0 {
         p.t.forceOutputCompare(0)
     }
-    if x & 0x40 != 0 {
+    if x&0x40 != 0 {
         p.t.forceOutputCompare(1)
     }
-    
+
     p.t.controlB = x & 0x3F
 }
 
@@ -44,7 +44,7 @@ func (p tcnt) Read() uint8 {
 
 func (p tcnt) Write(x uint8) {
     p.t.count = x
-    
+
     // Inhibit a compare match on the next clock
     p.t.inhibitCompareMatch = true
 }

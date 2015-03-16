@@ -8,6 +8,7 @@ import (
 // which instructions are supported.
 // See http://en.wikipedia.org/wiki/Atmel_AVR_instruction_set#Instruction_set_inheritance
 type MCUFamily int
+
 const (
     ReducedCore MCUFamily = iota
     MinimalCore
@@ -21,19 +22,19 @@ const (
 
 // An MCUSpec is a specification of a particular AVR variant.
 type MCUSpec struct {
-    Label            string
-    Family           MCUFamily
-    NumRegs          uint
-    LogProgMemSize   uint
-    LogDataSpaceSize uint
-    LogRAMSize       uint
-    LogEEPROMSize    uint
+    Label               string
+    Family              MCUFamily
+    NumRegs             uint
+    LogProgMemSize      uint
+    LogDataSpaceSize    uint
+    LogRAMSize          uint
+    LogEEPROMSize       uint
     InterruptVectorSize uint // size of a single interrupt vector, in words
-    IOBankSizes      []uint
-    Regions          []RegionSpec
-    Ports            map[string]avr.PortRef
-    Interrupts       map[string]uint
-    Available        [avr.NumInstructions]bool
+    IOBankSizes         []uint
+    Regions             []RegionSpec
+    Ports               map[string]avr.PortRef
+    Interrupts          map[string]uint
+    Available           [avr.NumInstructions]bool
 }
 
 // A RegionSpec is a specification of a region of data memory pertaining to a

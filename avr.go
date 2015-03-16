@@ -30,4 +30,3 @@ type PortRef struct {
     BankNum uint
     Index   uint16
 }
-

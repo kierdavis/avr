@@ -20,11 +20,11 @@ func (r RegsRegion) Contains(addr uint16) bool {
 }
 
 func (r RegsRegion) Load(addr uint16) uint8 {
-    return r.em.regs[addr - r.regionSpec.Start()]
+    return r.em.regs[addr-r.regionSpec.Start()]
 }
 
 func (r RegsRegion) Store(addr uint16, val uint8) {
-    r.em.regs[addr - r.regionSpec.Start()] = val
+    r.em.regs[addr-r.regionSpec.Start()] = val
 }
 
 type IORegion struct {
@@ -37,11 +37,11 @@ func (r IORegion) Contains(addr uint16) bool {
 }
 
 func (r IORegion) Load(addr uint16) uint8 {
-    return r.em.readPort(r.regionSpec.BankNum(), addr - r.regionSpec.Start())
+    return r.em.readPort(r.regionSpec.BankNum(), addr-r.regionSpec.Start())
 }
 
 func (r IORegion) Store(addr uint16, val uint8) {
-    r.em.writePort(r.regionSpec.BankNum(), addr - r.regionSpec.Start(), val)
+    r.em.writePort(r.regionSpec.BankNum(), addr-r.regionSpec.Start(), val)
 }
 
 type RAMRegion struct {
@@ -54,9 +54,9 @@ func (r RAMRegion) Contains(addr uint16) bool {
 }
 
 func (r RAMRegion) Load(addr uint16) uint8 {
-    return r.em.ram[addr - r.regionSpec.Start()]
+    return r.em.ram[addr-r.regionSpec.Start()]
 }
 
 func (r RAMRegion) Store(addr uint16, val uint8) {
-    r.em.ram[addr - r.regionSpec.Start()] = val
+    r.em.ram[addr-r.regionSpec.Start()] = val
 }

@@ -9,8 +9,8 @@ const _Flag_name = "FlagCFlagZFlagNFlagVFlagSFlagHFlagTFlagI"
 var _Flag_index = [...]uint8{0, 5, 10, 15, 20, 25, 30, 35, 40}
 
 func (i Flag) String() string {
-	if i < 0 || i+1 >= Flag(len(_Flag_index)) {
-		return fmt.Sprintf("Flag(%d)", i)
-	}
-	return _Flag_name[_Flag_index[i]:_Flag_index[i+1]]
+    if i < 0 || i+1 >= Flag(len(_Flag_index)) {
+        return fmt.Sprintf("Flag(%d)", i)
+    }
+    return _Flag_name[_Flag_index[i]:_Flag_index[i+1]]
 }

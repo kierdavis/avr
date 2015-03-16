@@ -18,13 +18,13 @@ type SregPort struct {
 
 func (p SregPort) Read() uint8 {
     return (p.em.flags[avr.FlagI] << 7) |
-           (p.em.flags[avr.FlagT] << 6) |
-           (p.em.flags[avr.FlagH] << 5) |
-           (p.em.flags[avr.FlagS] << 4) |
-           (p.em.flags[avr.FlagV] << 3) |
-           (p.em.flags[avr.FlagN] << 2) |
-           (p.em.flags[avr.FlagZ] << 1) |
-            p.em.flags[avr.FlagC]
+        (p.em.flags[avr.FlagT] << 6) |
+        (p.em.flags[avr.FlagH] << 5) |
+        (p.em.flags[avr.FlagS] << 4) |
+        (p.em.flags[avr.FlagV] << 3) |
+        (p.em.flags[avr.FlagN] << 2) |
+        (p.em.flags[avr.FlagZ] << 1) |
+        p.em.flags[avr.FlagC]
 }
 
 func (p SregPort) Write(x uint8) {

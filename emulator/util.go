@@ -70,7 +70,7 @@ func (w UnmappedPortWarning) String() string {
 
 // An invalid instruction word.
 type InvalidInstructionWarning struct {
-    PC          uint32
+    PC   uint32
     Word uint16
 }
 

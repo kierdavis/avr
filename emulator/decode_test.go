@@ -6,8 +6,8 @@ import (
 )
 
 type decodeTest struct {
-    word uint16
-    inst avr.Instruction
+    word        uint16
+    inst        avr.Instruction
     reducedCore bool
 }
 
@@ -212,7 +212,7 @@ var decodeTests = []decodeTest{
     decodeTest{word: 0x95a8, inst: avr.WDR},
     decodeTest{word: 0x9344, inst: avr.XCH},
     decodeTest{word: 0x92e4, inst: avr.XCH},
-    
+
     // TODO: add tests for opcodes that can resolve to two different instructions
     // depending on the status of the reducedCore flag.
 }

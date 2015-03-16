@@ -310,7 +310,7 @@ func doCALL(em *Emulator, word uint16) (cycles uint) {
 
     em.pushPC()
     em.pc = k
-    
+
     if em.Spec.LogProgMemSize > 16 {
         cycles = 5
     } else {
@@ -457,10 +457,10 @@ func doDEC(em *Emulator, word uint16) (cycles uint) {
 // DES encryption
 func doDES(em *Emulator, word uint16) (cycles uint) {
     k := (word & 0x00F0) >> 4
-    
+
     panic("doDES: unimplemented")
     _ = k
-    
+
     return 1 // TODO: 2 if not preceeded by another DES
 }
 
@@ -486,55 +486,55 @@ func doEIJMP(em *Emulator, word uint16) (cycles uint) {
 // extended load from program memory (destination implied to be r0)
 func doELPM_R0(em *Emulator, word uint16) (cycles uint) {
     addr := (uint32(em.rampz) << 16) | (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
-    x := em.prog[addr >> 1]
-    
+    x := em.prog[addr>>1]
+
     // lowest bit of address is byte select
-    if addr & 1 != 0 {
+    if addr&1 != 0 {
         em.regs[0] = uint8(x >> 8)
     } else {
         em.regs[0] = uint8(x)
     }
-    
+
     return 3
 }
 
 // extended load from program memory
 func doELPM(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
-    
+
     addr := (uint32(em.rampz) << 16) | (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
-    x := em.prog[addr >> 1]
-    
+    x := em.prog[addr>>1]
+
     // lowest bit of address is byte select
-    if addr & 1 != 0 {
+    if addr&1 != 0 {
         em.regs[d] = uint8(x >> 8)
     } else {
         em.regs[d] = uint8(x)
     }
-    
+
     return 3
 }
 
 // extended load from program memory (post-increment)
 func doELPM_INC(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
-    
+
     addr := (uint32(em.rampz) << 16) | (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
-    x := em.prog[addr >> 1]
-    
+    x := em.prog[addr>>1]
+
     // lowest bit of address is byte select
-    if addr & 1 != 0 {
+    if addr&1 != 0 {
         em.regs[d] = uint8(x >> 8)
     } else {
         em.regs[d] = uint8(x)
     }
-    
+
     // post-increment
     addr++
     em.rampz = uint8(addr >> 16)
     em.regs[31] = uint8(addr >> 8)
     em.regs[30] = uint8(addr)
-    
+
     return 3
 }
 
@@ -684,11 +684,11 @@ func doJMP(em *Emulator, word uint16) (cycles uint) {
 func doLAC(em *Emulator, word uint16) (cycles uint) {
     // Rd <- [Z]
     // [Z] <- [Z] & ~(old value of Rd)
-    
+
     d := (word & 0x01F0) >> 4
 
     var addr uint16
-    
+
     if em.Spec.LogDataSpaceSize > 16 {
         // Address is RAMPZ:R31:R30
         panic("doLAC: devices with a data space size > 16 not yet fully implemented")
@@ -699,13 +699,13 @@ func doLAC(em *Emulator, word uint16) (cycles uint) {
         // Address is R30
         addr = uint16(em.regs[30])
     }
-    
+
     x := em.regs[d]
     y := em.loadDataByte(addr)
-    
+
     em.regs[d] = y
     em.storeDataByte(addr, y & ^x)
-    
+
     return 1
 }
 
@@ -714,11 +714,11 @@ func doLAC(em *Emulator, word uint16) (cycles uint) {
 func doLAS(em *Emulator, word uint16) (cycles uint) {
     // Rd <- [Z]
     // [Z] <- [Z] | old value of Rd
-    
+
     d := (word & 0x01F0) >> 4
 
     var addr uint16
-    
+
     if em.Spec.LogDataSpaceSize > 16 {
         // Address is RAMPZ:R31:R30
         panic("doLAS: devices with a data space size > 16 not yet fully implemented")
@@ -729,13 +729,13 @@ func doLAS(em *Emulator, word uint16) (cycles uint) {
         // Address is R30
         addr = uint16(em.regs[30])
     }
-    
+
     x := em.regs[d]
     y := em.loadDataByte(addr)
-    
+
     em.regs[d] = y
-    em.storeDataByte(addr, y | x)
-    
+    em.storeDataByte(addr, y|x)
+
     return 1
 }
 
@@ -744,11 +744,11 @@ func doLAS(em *Emulator, word uint16) (cycles uint) {
 func doLAT(em *Emulator, word uint16) (cycles uint) {
     // Rd <- [Z]
     // [Z] <- [Z] ^ old value of Rd
-    
+
     d := (word & 0x01F0) >> 4
 
     var addr uint16
-    
+
     if em.Spec.LogDataSpaceSize > 16 {
         // Address is RAMPZ:R31:R30
         panic("doLAT: devices with a data space size > 16 not yet fully implemented")
@@ -759,13 +759,13 @@ func doLAT(em *Emulator, word uint16) (cycles uint) {
         // Address is R30
         addr = uint16(em.regs[30])
     }
-    
+
     x := em.regs[d]
     y := em.loadDataByte(addr)
-    
+
     em.regs[d] = y
-    em.storeDataByte(addr, y ^ x)
-    
+    em.storeDataByte(addr, y^x)
+
     return 1
 }
 
@@ -781,9 +781,9 @@ func doLAT(em *Emulator, word uint16) (cycles uint) {
 func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *uint8) (cycles uint) {
     ptrHiReg := ptrLoReg + 1
     d := (word & 0x01F0) >> 4
-    
+
     var addr uint16
-    
+
     // Get the addr
     if em.Spec.LogDataSpaceSize > 16 {
         // Address is RAMP?:Rh:Rl
@@ -795,26 +795,26 @@ func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *u
         // Address is Rl
         addr = uint16(em.regs[ptrLoReg])
     }
-    
+
     // Handle additional displacement
     if mode == 'd' {
         d := ((word & 0x2000) >> 8) | ((word & 0x0C00) >> 7) | (word & 0x0007)
         addr += d
     }
-    
+
     // Handle pre-decrement
     if mode == '-' {
         addr--
     }
-    
+
     // Do the load
     em.regs[d] = em.loadDataByte(addr)
-    
+
     // Handle post-increment
     if mode == '+' {
         addr++
     }
-    
+
     // Write back the addr if needed
     if mode == '+' || mode == '-' {
         if em.Spec.LogDataSpaceSize > 16 {
@@ -829,7 +829,7 @@ func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *u
             em.regs[ptrLoReg] = uint8(addr)
         }
     }
-    
+
     // Compute number of cycles
     // This is not fully compliant with the spec, but the spec has too many
     // special cases for full compliance to be worth it.
@@ -839,9 +839,9 @@ func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *u
         } else {
             cycles = 1
         }
-        
+
         return cycles
-    
+
     } else {
         if mode == '+' {
             cycles = 2
@@ -850,7 +850,7 @@ func doGenericLoad(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *u
         } else {
             cycles = 1
         }
-        
+
         return cycles
     }
 }
@@ -922,12 +922,12 @@ func doLDI(em *Emulator, word uint16) (cycles uint) {
 func doLDS(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     k := em.fetchProgWord()
-    
+
     if em.Spec.LogDataSpaceSize > 16 {
         //addr = k | (em.rampd << 16)
         panic("doLDS: devices with a data space size > 16 not yet fully implemented")
     }
-    
+
     em.regs[d] = em.loadDataByte(k)
     return 2
 }
@@ -936,12 +936,12 @@ func doLDS(em *Emulator, word uint16) (cycles uint) {
 func doLDS_SHORT(em *Emulator, word uint16) (cycles uint) {
     d := 16 + ((word & 0x00F0) >> 4)
     k := ((^word & 0x0100) >> 1) | ((word & 0x0100) >> 2) | ((word & 0x0600) >> 5) | (word & 0x000F)
-    
+
     if em.Spec.LogDataSpaceSize > 16 {
         //addr = k | (em.rampd << 16)
         panic("doLDS_SHORT: devices with a data space size > 16 not yet fully implemented")
     }
-    
+
     em.regs[d] = em.loadDataByte(k)
     return 2
 }
@@ -949,54 +949,54 @@ func doLDS_SHORT(em *Emulator, word uint16) (cycles uint) {
 // load from program memory (destinated implied to be r0)
 func doLPM_R0(em *Emulator, word uint16) (cycles uint) {
     addr := (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
-    x := em.prog[addr >> 1]
-    
+    x := em.prog[addr>>1]
+
     // lowest bit of address is byte select
-    if addr & 1 != 0 {
+    if addr&1 != 0 {
         em.regs[0] = uint8(x >> 8)
     } else {
         em.regs[0] = uint8(x)
     }
-    
+
     return 3
 }
 
 // load from program memory
 func doLPM(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
-    
+
     addr := (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
-    x := em.prog[addr >> 1]
-    
+    x := em.prog[addr>>1]
+
     // lowest bit of address is byte select
-    if addr & 1 != 0 {
+    if addr&1 != 0 {
         em.regs[d] = uint8(x >> 8)
     } else {
         em.regs[d] = uint8(x)
     }
-    
+
     return 3
 }
 
 // load from program memory (post-increment)
 func doLPM_INC(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
-    
+
     addr := (uint32(em.regs[31]) << 8) | uint32(em.regs[30])
-    x := em.prog[addr >> 1]
-    
+    x := em.prog[addr>>1]
+
     // lowest bit of address is byte select
-    if addr & 1 != 0 {
+    if addr&1 != 0 {
         em.regs[d] = uint8(x >> 8)
     } else {
         em.regs[d] = uint8(x)
     }
-    
+
     // post-increment
     addr++
     em.regs[31] = uint8(addr >> 8)
     em.regs[30] = uint8(addr)
-    
+
     return 3
 }
 
@@ -1176,7 +1176,7 @@ func doPOP(em *Emulator, word uint16) (cycles uint) {
 func doPUSH(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     em.push(em.regs[d])
-    
+
     if em.Spec.Family == spec.XMEGA {
         return 1
     } else {
@@ -1189,20 +1189,20 @@ func doRCALL(em *Emulator, word uint16) (cycles uint) {
     k := int32(word & 0x0FFF)
     // sign-extend from 12 to 32 bits
     k = (k << 20) >> 20
-    
+
     // push PC
     em.pushPC()
-    
+
     // do the jump
     em.pc += uint32(k)
-    
+
     // compute cycles
     if em.Spec.LogProgMemSize > 16 {
         cycles = 4
     } else {
         cycles = 3
     }
-    
+
     if em.Spec.Family == spec.ReducedCore {
         return 4
     } else if em.Spec.Family == spec.XMEGA {
@@ -1215,7 +1215,7 @@ func doRCALL(em *Emulator, word uint16) (cycles uint) {
 // return from subroutine
 func doRET(em *Emulator, word uint16) (cycles uint) {
     em.popPC()
-    
+
     if em.Spec.LogProgMemSize > 16 {
         return 5
     } else {
@@ -1240,10 +1240,10 @@ func doRJMP(em *Emulator, word uint16) (cycles uint) {
     k := int32(word & 0x0FFF)
     // sign-extend from 12 to 32 bits
     k = (k << 20) >> 20
-    
+
     // do the jump
     em.pc += uint32(k)
-    
+
     return 2
 }
 
@@ -1332,14 +1332,14 @@ func doSBI(em *Emulator, word uint16) (cycles uint) {
 func doSBIC(em *Emulator, word uint16) (cycles uint) {
     a := (word & 0x00F8) >> 3
     b := word & 0x0007
-    
+
     x := em.readPort(0, a)
-    if (x >> b) & 1 == 0 {
+    if (x>>b)&1 == 0 {
         cycles = em.skip() + 1
     } else {
         cycles = 1
     }
-    
+
     if em.Spec.Family == spec.XMEGA {
         return cycles + 1
     } else {
@@ -1351,14 +1351,14 @@ func doSBIC(em *Emulator, word uint16) (cycles uint) {
 func doSBIS(em *Emulator, word uint16) (cycles uint) {
     a := (word & 0x00F8) >> 3
     b := word & 0x0007
-    
+
     x := em.readPort(0, a)
-    if (x >> b) & 1 != 0 {
+    if (x>>b)&1 != 0 {
         cycles = em.skip() + 1
     } else {
         cycles = 1
     }
-    
+
     if em.Spec.Family == spec.XMEGA {
         return cycles + 1
     } else {
@@ -1391,8 +1391,8 @@ func doSBIW(em *Emulator, word uint16) (cycles uint) {
 func doSBRC(em *Emulator, word uint16) (cycles uint) {
     r := (word & 0x01F0) >> 4
     b := word & 0x0007
-    
-    if (em.regs[r] >> b) & 1 == 0 {
+
+    if (em.regs[r]>>b)&1 == 0 {
         return em.skip() + 1
     } else {
         return 1
@@ -1403,8 +1403,8 @@ func doSBRC(em *Emulator, word uint16) (cycles uint) {
 func doSBRS(em *Emulator, word uint16) (cycles uint) {
     r := (word & 0x01F0) >> 4
     b := word & 0x0007
-    
-    if (em.regs[r] >> b) & 1 != 0 {
+
+    if (em.regs[r]>>b)&1 != 0 {
         return em.skip() + 1
     } else {
         return 1
@@ -1441,9 +1441,9 @@ func doSPM_2(em *Emulator, word uint16) (cycles uint) {
 func doGenericStore(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *uint8) (cycles uint) {
     ptrHiReg := ptrLoReg + 1
     d := (word & 0x01F0) >> 4
-    
+
     var addr uint16
-    
+
     // Get the addr
     if em.Spec.LogDataSpaceSize > 16 {
         // Address is RAMP?:Rh:Rl
@@ -1455,26 +1455,26 @@ func doGenericStore(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *
         // Address is Rl
         addr = uint16(em.regs[ptrLoReg])
     }
-    
+
     // Handle additional displacement
     if mode == 'd' {
         d := ((word & 0x2000) >> 8) | ((word & 0x0C00) >> 7) | (word & 0x0007)
         addr += d
     }
-    
+
     // Handle pre-decrement
     if mode == '-' {
         addr--
     }
-    
+
     // Do the store
     em.storeDataByte(addr, em.regs[d])
-    
+
     // Handle post-increment
     if mode == '+' {
         addr++
     }
-    
+
     // Write back the addr if needed
     if mode == '+' || mode == '-' {
         if em.Spec.LogDataSpaceSize > 16 {
@@ -1489,7 +1489,7 @@ func doGenericStore(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *
             em.regs[ptrLoReg] = uint8(addr)
         }
     }
-    
+
     // Compute number of cycles
     // This is not fully compliant with the spec, but the spec has too many
     // special cases for full compliance to be worth it.
@@ -1499,16 +1499,16 @@ func doGenericStore(em *Emulator, word uint16, mode byte, ptrLoReg int, ptrExt *
         } else {
             cycles = 1
         }
-        
+
         return cycles
-    
+
     } else {
         if mode == '-' {
             cycles = 2
         } else {
             cycles = 1
         }
-        
+
         return cycles
     }
 }
@@ -1572,12 +1572,12 @@ func doSTD_Z(em *Emulator, word uint16) (cycles uint) {
 func doSTS(em *Emulator, word uint16) (cycles uint) {
     d := (word & 0x01F0) >> 4
     k := em.fetchProgWord()
-    
+
     if em.Spec.LogDataSpaceSize > 16 {
         //addr = k | (em.rampd << 16)
         panic("doSTS: devices with a data space size > 16 not yet fully implemented")
     }
-    
+
     em.storeDataByte(k, em.regs[d])
     return 2
 }
@@ -1586,12 +1586,12 @@ func doSTS(em *Emulator, word uint16) (cycles uint) {
 func doSTS_SHORT(em *Emulator, word uint16) (cycles uint) {
     d := 16 + ((word & 0x00F0) >> 4)
     k := ((^word & 0x0100) >> 1) | ((word & 0x0100) >> 2) | ((word & 0x0600) >> 5) | (word & 0x000F)
-    
+
     if em.Spec.LogDataSpaceSize > 16 {
         //addr = k | (em.rampd << 16)
         panic("doSTS_SHORT: devices with a data space size > 16 not yet fully implemented")
     }
-    
+
     em.storeDataByte(k, em.regs[d])
     return 1
 }
@@ -1662,11 +1662,11 @@ func doWDR(em *Emulator, word uint16) (cycles uint) {
 func doXCH(em *Emulator, word uint16) (cycles uint) {
     // Rd <- [Z]
     // [Z] <- old value of Rd
-    
+
     d := (word & 0x01F0) >> 4
 
     var addr uint16
-    
+
     if em.Spec.LogDataSpaceSize > 16 {
         // Address is RAMPZ:R31:R30
         panic("doXCH: devices with a data space size > 16 not yet fully implemented")
@@ -1677,12 +1677,12 @@ func doXCH(em *Emulator, word uint16) (cycles uint) {
         // Address is R30
         addr = uint16(em.regs[30])
     }
-    
+
     x := em.regs[d]
     y := em.loadDataByte(addr)
-    
+
     em.regs[d] = y
     em.storeDataByte(addr, x)
-    
+
     return 1
 }

@@ -14,21 +14,21 @@ import (
 )
 
 type Timer struct {
-    em *emulator.Emulator
-    digit uint
-    controlA uint8
-    controlB uint8
-    count uint8
-    compareValA uint8
-    compareValB uint8
-    interruptMask uint8
-    interruptFlags uint8
-    downwards bool // count direction
-    ocPinStates [2]bool
-    ocPinCallbacks [2]func(bool)
-    logging bool
+    em                  *emulator.Emulator
+    digit               uint
+    controlA            uint8
+    controlB            uint8
+    count               uint8
+    compareValA         uint8
+    compareValB         uint8
+    interruptMask       uint8
+    interruptFlags      uint8
+    downwards           bool // count direction
+    ocPinStates         [2]bool
+    ocPinCallbacks      [2]func(bool)
+    logging             bool
     inhibitCompareMatch bool // set when TCNT is written to prevent a compare match on the next clock
-    excessTicks uint
+    excessTicks         uint
 }
 
 func New(digit uint) (t *Timer) {
@@ -43,7 +43,7 @@ func (t *Timer) SetLogging(enabled bool) {
 
 func (t *Timer) AddTo(em *emulator.Emulator) {
     t.em = em
-    
+
     em.RegisterPortByName(fmt.Sprintf("TCCR%dA", t.digit), tccra{t})
     em.RegisterPortByName(fmt.Sprintf("TCCR%dB", t.digit), tccrb{t})
     em.RegisterPortByName(fmt.Sprintf("TCNT%d", t.digit), tcnt{t})
@@ -63,7 +63,7 @@ func (t *Timer) OverrideOCPin(ocPinNum uint, gpioPinNum uint, g *gpio.GPIO) {
 
 func (t *Timer) Run(ticks uint) {
     var ticksIncr uint
-    
+
     switch t.controlB & 0x07 {
     case 0: // disabled
         t.excessTicks = 0
@@ -82,12 +82,12 @@ func (t *Timer) Run(ticks uint) {
         panic("(*Timer).Run: external clock sources not implemented")
     }
     ticksExecuted := t.excessTicks
-    
+
     for ticksExecuted < ticks {
         t.Tick()
         ticksExecuted += ticksIncr
     }
-    
+
     t.excessTicks = ticksExecuted - ticks
 }
 
@@ -104,7 +104,7 @@ func (t *Timer) Tick() {
             t.setOCF(1)
         }
     }
-    
+
     // Prepare to tick counter
     switch t.getWGM() {
     case 0: // Normal
@@ -120,28 +120,28 @@ func (t *Timer) Tick() {
     case 7: // Fast PWM (TOP = OCRA)
         t.tickPCPWMMode(t.compareValA)
     }
-    
+
     // Actually tick the counter
     if t.downwards {
         t.count--
     } else {
         t.count++
     }
-    
+
     // Trigger interrupts, if possible
     if t.em != nil && t.em.InterruptsEnabled() {
         intName := ""
-        if t.interruptFlags & 0x01 != 0 && t.interruptMask & 0x01 != 0 {
+        if t.interruptFlags&0x01 != 0 && t.interruptMask&0x01 != 0 {
             t.interruptFlags &= 0xFE
             intName = fmt.Sprintf("TIMER%d_OVF", t.digit)
-        } else if t.interruptFlags & 0x02 != 0 && t.interruptMask & 0x02 != 0 {
+        } else if t.interruptFlags&0x02 != 0 && t.interruptMask&0x02 != 0 {
             t.interruptFlags &= 0xFD
             intName = fmt.Sprintf("TIMER%d_COMPA", t.digit)
-        } else if t.interruptFlags & 0x04 != 0 && t.interruptMask & 0x04 != 0 {
+        } else if t.interruptFlags&0x04 != 0 && t.interruptMask&0x04 != 0 {
             t.interruptFlags &= 0xFB
             intName = fmt.Sprintf("TIMER%d_COMPB", t.digit)
         }
-        
+
         if intName != "" {
             ok := t.em.InterruptByName(intName)
             if !ok && t.logging {
@@ -157,7 +157,7 @@ func (t *Timer) tickNormalMode() {
     if t.count == 0xFF { // Overflow
         t.setTOV()
     }
-    
+
     t.checkOCPinNormalMode(0, t.compareValA)
     t.checkOCPinNormalMode(1, t.compareValB)
 }
@@ -195,7 +195,7 @@ func (t *Timer) tickPCPWMMode(top uint8) {
             t.downwards = true // Begin counting downwards
         }
     }
-    
+
     t.checkOCPinPCPWMMode(0, t.compareValA)
     t.checkOCPinPCPWMMode(1, t.compareValB)
 }
@@ -208,7 +208,7 @@ func (t *Timer) checkOCPinPCPWMMode(ocPinNum uint, compareVal uint8) {
         case 0: // OCy disabled
             // do nothing
         case 1: // Toggle OCy (only on OC pin 0 with WGM2 bit set)
-            if ocPinNum == 0 && (t.controlB & 0x80) != 0 {
+            if ocPinNum == 0 && (t.controlB&0x80) != 0 {
                 t.toggleOCPin(ocPinNum)
             }
         case 2: // Clear OCy if counting upwards or set OCy if counting downwards
@@ -230,16 +230,16 @@ func (t *Timer) checkOCPinPCPWMMode(ocPinNum uint, compareVal uint8) {
 // Tick the timer in clear-timer-on-compare mode.
 func (t *Timer) tickCTCMode() {
     t.downwards = false
-    
+
     if t.count == 0xFF { // Overflow
         t.setTOV()
     }
-    
+
     if t.count == t.compareValA {
         // this tick should set counter to 0
         t.count = 0xFF
     }
-    
+
     t.checkOCPinCTCMode(0, t.compareValA)
     t.checkOCPinCTCMode(1, t.compareValB)
 }
@@ -268,13 +268,13 @@ func (t *Timer) changeOCPinCTCMode(ocPinNum uint) {
 // Tick the timer in fast PWM mode.
 func (t *Timer) tickFastPWMMode(top uint8) {
     t.downwards = false
-    
+
     if t.count == top {
         // this tick should set counter to 0
         t.count = 0xFF
         t.setTOV()
     }
-    
+
     t.checkOCPinFastPWMMode(0, t.compareValA)
     t.checkOCPinFastPWMMode(1, t.compareValB)
 }
@@ -295,7 +295,7 @@ func (t *Timer) checkOCPinFastPWMMode(ocPinNum uint, compareVal uint8) {
             t.clearOCPin(ocPinNum)
         }
     }
-    
+
     // Compare match
     if t.count == compareVal {
         // Get COMxy bits
@@ -303,7 +303,7 @@ func (t *Timer) checkOCPinFastPWMMode(ocPinNum uint, compareVal uint8) {
         case 0: // OCy disabled
             // do nothing
         case 1: // Toggle OCy on compare match (only on OC pin 0 with WGM2 bit set)
-            if ocPinNum == 0 && (t.controlB & 0x80) != 0 {
+            if ocPinNum == 0 && (t.controlB&0x80) != 0 {
                 t.toggleOCPin(ocPinNum)
             }
         case 2: // Clear OCy on compare match, set OCy at BOTTOM
@@ -372,7 +372,7 @@ func (t *Timer) setTOV() {
 
 // Get the WGM (waveform generation mode) bits
 func (t *Timer) getWGM() (wgm uint8) {
-    wgmA := t.controlA & 0x03 // bits 1 and 0
+    wgmA := t.controlA & 0x03        // bits 1 and 0
     wgmB := (t.controlB & 0x08) >> 1 // bit 3 (shifted to bit 2)
     return wgmB | wgmA
 }

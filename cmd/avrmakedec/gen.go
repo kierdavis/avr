@@ -57,4 +57,3 @@ func (g *Generator) Format() []byte {
     }
     return src
 }
-
