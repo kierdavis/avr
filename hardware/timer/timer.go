@@ -102,9 +102,6 @@ func (t *Timer) Run(ticks uint) {
 
 // Tick the timer.
 func (t *Timer) Tick() {
-    // Get the waveform generation mode bits
-    wgm := t.getWGM()
-    
     // Handle match-compare interrupts
     if t.inhibitCompareMatch {
         t.inhibitCompareMatch = false
@@ -118,7 +115,7 @@ func (t *Timer) Tick() {
     }
     
     // Prepare to tick counter
-    switch wgm {
+    switch t.getWGM() {
     case 0: // Normal
         t.tickNormalMode()
     case 1: // Phase-correct PWM (TOP = 0xFF)
@@ -183,8 +180,7 @@ func (t *Timer) checkOCPinNormalMode(ocPinNum uint, compareVal uint8) {
 
 func (t *Timer) changeOCPinNormalMode(ocPinNum uint) {
     // Get COMxy bits
-    com := t.getCOM(ocPinNum)
-    switch com {
+    switch t.getCOM(ocPinNum) {
     case 0: // OCy disabled
         // do nothing
     case 1: // toggle OCy
@@ -219,8 +215,7 @@ func (t *Timer) tickPCPWMMode(top uint8) {
 func (t *Timer) checkOCPinPCPWMMode(ocPinNum uint, compareVal uint8) {
     if t.count == compareVal {
         // Get COMxy bits
-        com := t.getCOM(ocPinNum)
-        switch com {
+        switch t.getCOM(ocPinNum) {
         case 0: // OCy disabled
             // do nothing
         case 1: // Toggle OCy (only on OC pin 0 with WGM2 bit set)
@@ -269,8 +264,7 @@ func (t *Timer) checkOCPinCTCMode(ocPinNum uint, compareVal uint8) {
 
 func (t *Timer) changeOCPinCTCMode(ocPinNum uint) {
     // Get COMxy bits
-    com := t.getCOM(ocPinNum)
-    switch com {
+    switch t.getCOM(ocPinNum) {
     case 0: // OCy disabled
         // do nothing
     case 1: // toggle OCy
@@ -301,8 +295,7 @@ func (t *Timer) checkOCPinFastPWMMode(ocPinNum uint, compareVal uint8) {
     // BOTTOM
     if t.count == 0x00 {
         // Get COMxy bits
-        com := t.getCOM(ocPinNum)
-        switch com {
+        switch t.getCOM(ocPinNum) {
         case 0: // OCy disabled
             // do nothing
         case 1: // Toggle OCy on compare match (only on OC pin 0 with WGM2 bit set)
@@ -317,8 +310,7 @@ func (t *Timer) checkOCPinFastPWMMode(ocPinNum uint, compareVal uint8) {
     // Compare match
     if t.count == compareVal {
         // Get COMxy bits
-        com := t.getCOM(ocPinNum)
-        switch com {
+        switch t.getCOM(ocPinNum) {
         case 0: // OCy disabled
             // do nothing
         case 1: // Toggle OCy on compare match (only on OC pin 0 with WGM2 bit set)
