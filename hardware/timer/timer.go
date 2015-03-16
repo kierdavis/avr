@@ -208,7 +208,7 @@ func (t *Timer) checkOCPinPCPWMMode(ocPinNum uint, compareVal uint8) {
         case 0: // OCy disabled
             // do nothing
         case 1: // Toggle OCy (only on OC pin 0 with WGM2 bit set)
-            if ocPinNum == 0 && (t.controlB&0x80) != 0 {
+            if ocPinNum == 0 && (t.controlB&0x08) != 0 {
                 t.toggleOCPin(ocPinNum)
             }
         case 2: // Clear OCy if counting upwards or set OCy if counting downwards
@@ -303,7 +303,7 @@ func (t *Timer) checkOCPinFastPWMMode(ocPinNum uint, compareVal uint8) {
         case 0: // OCy disabled
             // do nothing
         case 1: // Toggle OCy on compare match (only on OC pin 0 with WGM2 bit set)
-            if ocPinNum == 0 && (t.controlB&0x80) != 0 {
+            if ocPinNum == 0 && (t.controlB&0x08) != 0 {
                 t.toggleOCPin(ocPinNum)
             }
         case 2: // Clear OCy on compare match, set OCy at BOTTOM
