@@ -20,7 +20,9 @@ type Timer struct {
     controlB            uint8
     count               uint8
     compareValA         uint8
+    compareValBufferA   uint8
     compareValB         uint8
+    compareValBufferB   uint8
     interruptMask       uint8
     interruptFlags      uint8
     downwards           bool // count direction
@@ -153,6 +155,10 @@ func (t *Timer) Tick() {
 
 // Tick the timer in Normal mode.
 func (t *Timer) tickNormalMode() {
+    // double buffering of OCRs is disabled
+    t.compareValA = t.compareValBufferA
+    t.compareValB = t.compareValBufferB
+    
     t.downwards = false
     if t.count == 0xFF { // Overflow
         t.setTOV()
@@ -185,6 +191,12 @@ func (t *Timer) changeOCPinNormalMode(ocPinNum uint) {
 
 // Tick the timer in phase-corrected PWM mode.
 func (t *Timer) tickPCPWMMode(top uint8) {
+    // double buffering of OCRs is enabled
+    if t.count == top {
+        t.compareValA = t.compareValBufferA
+        t.compareValB = t.compareValBufferB
+    }
+    
     if t.downwards {
         if t.count == 0x00 { // Reached BOTTOM
             t.downwards = false // Begin counting upwards
@@ -229,6 +241,10 @@ func (t *Timer) checkOCPinPCPWMMode(ocPinNum uint, compareVal uint8) {
 
 // Tick the timer in clear-timer-on-compare mode.
 func (t *Timer) tickCTCMode() {
+    // double buffering of OCRs is disabled
+    t.compareValA = t.compareValBufferA
+    t.compareValB = t.compareValBufferB
+    
     t.downwards = false
 
     if t.count == 0xFF { // Overflow
@@ -267,6 +283,12 @@ func (t *Timer) changeOCPinCTCMode(ocPinNum uint) {
 
 // Tick the timer in fast PWM mode.
 func (t *Timer) tickFastPWMMode(top uint8) {
+    // double buffering of OCRs is enabled
+    if t.count == 0x00 {
+        t.compareValA = t.compareValBufferA
+        t.compareValB = t.compareValBufferB
+    }
+    
     t.downwards = false
 
     if t.count == top {

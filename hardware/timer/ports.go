@@ -55,11 +55,11 @@ type ocra struct {
 }
 
 func (p ocra) Read() uint8 {
-    return p.t.compareValA
+    return p.t.compareValBufferA
 }
 
 func (p ocra) Write(x uint8) {
-    p.t.compareValA = x
+    p.t.compareValBufferA = x
 }
 
 // Implementation of OCRxb port
@@ -68,11 +68,11 @@ type ocrb struct {
 }
 
 func (p ocrb) Read() uint8 {
-    return p.t.compareValB
+    return p.t.compareValBufferB
 }
 
 func (p ocrb) Write(x uint8) {
-    p.t.compareValB = x
+    p.t.compareValBufferB = x
 }
 
 // Implementation of TIMSKx port
