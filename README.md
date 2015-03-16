@@ -47,6 +47,8 @@ they are added) will produce about 20 "access of unmapped I/O port" warnings.
 This is simply due to the program initialising hardware subsystems that are not
 yet implemented in the emulator.
 
+[arduino]: http://www.arduino.cc/
+
 ## Performance
 
 The maximum unthrottled clock rate approaches 35 MHz on my 2.3 GHz Intel i7
